@@ -4093,7 +4093,7 @@
 
           for (const key in cartItemsList) {
             const p = cartItemsList[key];
-            total += parseInt(p.pr.replace(/[^\d]/g, "")) || 0;
+            total += parseInt(String(p.pr).replace(/[^\d]/g, "")) || 0;
             newCats.add(p.cat || getCurrentCategory());
           }
 
@@ -5542,16 +5542,16 @@
           botContent += `
       <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
-          <button onclick="addCuisineComboToCart('north')" style="background:#FFFBEB; border:1px solid #FCD34D; color:#B45309; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
+          <button onclick="addCuisineComboToCart(this, 'north')" style="background:#FFFBEB; border:1px solid #FCD34D; color:#B45309; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
             🇮🇳 Add North Indian (₹520)
           </button>
-          <button onclick="addCuisineComboToCart('south')" style="background:#F0FDF4; border:1px solid #86EFAC; color:#15803D; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
+          <button onclick="addCuisineComboToCart(this, 'south')" style="background:#F0FDF4; border:1px solid #86EFAC; color:#15803D; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
             🌴 Add South Indian (₹410)
           </button>
-          <button onclick="addCuisineComboToCart('chinese')" style="background:#FEF2F2; border:1px solid #FCA5A5; color:#B91C1C; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
+          <button onclick="addCuisineComboToCart(this, 'chinese')" style="background:#FEF2F2; border:1px solid #FCA5A5; color:#B91C1C; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
             🥢 Add Indo-Chinese (₹380)
           </button>
-          <button onclick="addCuisineComboToCart('italian')" style="background:#FBF0FF; border:1px solid #E9D5FF; color:#7E22CE; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
+          <button onclick="addCuisineComboToCart(this, 'italian')" style="background:#FBF0FF; border:1px solid #E9D5FF; color:#7E22CE; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
             🍝 Add Italian (₹460)
           </button>
         </div>
@@ -5642,7 +5642,11 @@
         toast(`🛒 Added all ${addedCount} replaced meal ingredients to cart! 🎉`);
       };
 
-      window.addCuisineComboToCart = function(type) {
+      window.addCuisineComboToCart = function(btn, type) {
+        if (typeof btn === "string" && !type) {
+          type = btn;
+          btn = null;
+        }
         const cuisineMap = {
           north: { name: "North Indian Dinner", items: [
             { id: "c_pnr", em: "🧀", nm: "Amul Fresh Malai Paneer", wt: "200 g", pr: 95, cat: "Dairy,Bread & Eggs" },
@@ -5678,6 +5682,12 @@
         });
 
         updateCartTotal();
+        if (btn) {
+          btn.innerHTML = `✓ ADDED ${choice.name.toUpperCase()}!`;
+          btn.style.background = "#059669";
+          btn.style.color = "#fff";
+          btn.style.borderColor = "#059669";
+        }
         toast(`🛒 Added ${choice.name} combo to cart! 🎉`);
       };
 
