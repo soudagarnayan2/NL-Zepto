@@ -5742,7 +5742,7 @@
           btn.innerHTML = "✓ ADDED ALL INGREDIENTS TO CART!";
           btn.style.background = "#059669";
         }
-        toast(`🛒 Added all ${addedCount} meal ingredients (Paneer, Tomatoes, Onions, Rice, Curd, Spices) to cart! 🎉`);
+        toast(`Awesome! Your dinner basket is ready in your cart.`);
       };
 
       window.addReplacedMealComboToCart = function (btn) {
@@ -5768,7 +5768,7 @@
           btn.innerHTML = "✓ ADDED REPLACED INGREDIENTS TO CART!";
           btn.style.background = "#059669";
         }
-        toast(`🛒 Added all ${addedCount} replaced meal ingredients to cart! 🎉`);
+        toast(`Awesome! Your replaced meal basket is ready in your cart.`);
       };
 
       window.addCuisineComboToCart = function (btn, type) {
@@ -5825,7 +5825,7 @@
           btn.style.color = "#fff";
           btn.style.borderColor = "#059669";
         }
-        toast(`🛒 Added ${choice.name} combo to cart! 🎉`);
+        toast(`Awesome! Your ${choice.name} basket is ready in your cart.`);
       };
 
       function getOfflineChatResponse(query) {
