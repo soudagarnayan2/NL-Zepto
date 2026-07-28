@@ -2898,6 +2898,9 @@
           <div class="quick-suggestions">
             <div class="qs-label">✨ Try asking…</div>
             <div class="qs-chips">
+              <button class="q-chip-btn" data-query="Plan a dinner for 4 people under ₹600">
+                <span class="chip-em">🍲</span> Plan dinner (under ₹600)
+              </button>
               <button class="q-chip-btn" data-query="What goes well with instant noodles?">
                 <span class="chip-em">🍜</span> Noodle pairings
               </button>
@@ -6186,7 +6189,7 @@
 
       document.querySelectorAll(".q-chip-btn").forEach(btn => {
         btn.onclick = () => {
-          const text = btn.textContent;
+          const text = btn.dataset.query || btn.textContent.trim();
           sendChatMessage(text);
         };
       });
