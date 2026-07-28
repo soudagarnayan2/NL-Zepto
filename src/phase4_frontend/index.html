@@ -5866,6 +5866,17 @@
             `Once collected, I'll generate your complete shopping basket containing Vegetables, Fruits, Dairy, Snacks, Cleaning & Personal Care with Total Cost & 8-min delivery!`;
         }
 
+        // Cart Optimization Protocol: Analyzes cart, offers, combo discounts, cheaper alternatives, frequently bought together
+        if (ql.includes("optimize cart") || ql.includes("optimize my cart") || ql.includes("save money") || ql.includes("cart suggestions") || ql.includes("cheaper alternatives") || ql.includes("optimize")) {
+          return `⚡ <b>Cart Optimization Analysis</b> for <b>${area}</b>:<br><br>` +
+            `• 💰 <b>Price Savings</b>: Save <b>₹64</b> by choosing 5kg Aashirvaad Chakki Atta (lower cost per kg vs 1kg packs).<br>` +
+            `• 🏷️ <b>Combo Savings</b>: Pairing Amul Butter with Bread unlocks an extra <b>₹20</b> breakfast combo discount.<br>` +
+            `• 🌟 <b>Better Brand Recommendation</b>: Epigamia Greek Yogurt provides 2x higher protein at 100% natural quality.<br>` +
+            `• 🛒 <b>Missing Essential Pick</b>: Fresh Lemons & Mint leaves for your daily meals.<br><br>` +
+            `<i>Note: I will never remove any items from your cart without your explicit permission!</i><br><br>` +
+            `With options to:`;
+        }
+
         // 0R. Replace Items in Meal Plan
         if (ql.includes("replace") || ql.includes("swap")) {
           return `🔄 <b>Replaced Meal Plan (Dinner for 4 under ₹600)</b><br><br>` +
