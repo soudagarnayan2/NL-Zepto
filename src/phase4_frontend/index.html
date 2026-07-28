@@ -5877,6 +5877,16 @@
             `With options to:`;
         }
 
+        // Health & Dietary Goals Protocol: Handles Weight loss, Muscle gain, Diabetes, Heart healthy, High protein
+        if (ql.includes("weight loss") || ql.includes("muscle gain") || ql.includes("diabetes") || ql.includes("heart healthy") || ql.includes("high protein") || ql.includes("health goal") || ql.includes("nutrition")) {
+          return `🥗 <b>Health & Nutrition Goal Recommendations</b> for <b>${area}</b>:<br><br>` +
+            `• <b>Healthy Alternatives</b>: Whole Wheat Atta & Rolled Oats (complex carbs for sustained energy)<br>` +
+            `• <b>Higher Protein Options</b>: Amul Fresh Malai Paneer (18g protein/100g) & Organic Moong Dal<br>` +
+            `• <b>Lower Sugar Options</b>: Epigamia Plain Unsweetened Greek Yogurt & Almond Milk<br><br>` +
+            `<i>⚠️ Disclaimer: Please consult a qualified healthcare professional or dietitian for personalized medical advice.</i><br><br>` +
+            `With options to:`;
+        }
+
         // 0R. Replace Items in Meal Plan
         if (ql.includes("replace") || ql.includes("swap")) {
           return `🔄 <b>Replaced Meal Plan (Dinner for 4 under ₹600)</b><br><br>` +
