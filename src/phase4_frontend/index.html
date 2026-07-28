@@ -5943,6 +5943,21 @@
             `With options to:`;
         }
 
+        // Budget Grocery Basket Protocol: Generates basket within strict budget prioritizing Staples, Veggies, Dairy, Proteins, Household
+        if (ql.includes("under ₹") || ql.includes("under rs") || ql.includes("budget basket") || ql.includes("budget grocery")) {
+          return `💵 <b>Strict Budget Grocery Basket (Target: ₹500)</b> for <b>${area}</b>:<br><br>` +
+            `• 🌾 <b>Staples</b>: Fortune Everyday Basmati Rice (1kg) — ₹149<br>` +
+            `• 🥦 <b>Vegetables</b>: Hybrid Tomatoes (1kg) & Red Onions (1kg) — ₹70<br>` +
+            `• 🥛 <b>Dairy</b>: Mother Dairy Cow Milk (500ml) & Amul Paneer (200g) — ₹123<br>` +
+            `• 🥩 <b>Proteins</b>: Organic Yellow Moong Dal (500g) — ₹89<br>` +
+            `• 🧻 <b>Household</b>: Kitchen Tissue 2-Ply Roll — ₹45<br><br>` +
+            `📊 <b>Cost Breakdown</b>:<br>` +
+            `• Total Basket Cost: <b>₹476</b><br>` +
+            `• Remaining Budget: <b>₹24</b> (Strictly under ₹500 budget limit)<br>` +
+            `• Estimated Savings: <b>₹65</b> (via MRP discounts)<br><br>` +
+            `With options to:`;
+        }
+
         // Ingredient-Based Recipe Protocol: Generates recipe using given ingredients, identifies missing ingredients, cooking steps, YouTube link
         if (ql.includes("i have") || ql.includes("ingredients:") || ql.includes("using ingredients") || ql.includes("with ingredients")) {
           return `🍳 <b>Custom Recipe from Your Ingredients</b>:<br><br>` +
