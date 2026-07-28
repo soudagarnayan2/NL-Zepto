@@ -5519,6 +5519,24 @@
     `;
         }
 
+        if (ql.includes("meal") || ql.includes("dinner") || ql.includes("lunch") || ql.includes("ingredient") || botContent.includes("With options to:")) {
+          botContent += `
+      <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
+        <button onclick="addMealPlanComboToCart(this)" style="width:100%; background:linear-gradient(135deg,#16A34A,#15803D); color:#fff; border:none; font-size:11px; font-weight:900; padding:8px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.25);">
+          🛒 Add All (Paneer, Tomatoes, Onions, Rice, Curd, Spices)
+        </button>
+        <div style="display:flex; gap:6px;">
+          <button onclick="sendChatMessage('Replace items in meal plan')" style="flex:1; background:#FFFBEB; border:1px solid #FCD34D; color:#B45309; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
+            🔄 Replace Items
+          </button>
+          <button onclick="sendChatMessage('Change cuisine for meal plan')" style="flex:1; background:#FBF0FF; border:1px solid #E9D5FF; color:#7E22CE; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
+            🍲 Change Cuisine
+          </button>
+        </div>
+      </div>
+    `;
+        }
+
         botContent += `
       <div style="margin-top:10px; display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; scrollbar-width:none; justify-content: flex-start;">
         ${suggestedCats.map(cat => `
@@ -5534,9 +5552,48 @@
         renderChatMessages();
       }
 
+      window.addMealPlanComboToCart = function(btn) {
+        const mealItems = [
+          { id: "mp_pnr", em: "🧀", nm: "Amul Fresh Malai Paneer", wt: "200 g", pr: 95, was: 110, cat: "Dairy,Bread & Eggs" },
+          { id: "mp_tom", em: "🍅", nm: "Farm Fresh Hybrid Tomatoes", wt: "1 kg", pr: 38, was: 45, cat: "Fruits & vegetables" },
+          { id: "mp_oni", em: "🧅", nm: "Fresho Fresh Red Onions", wt: "1 kg", pr: 32, was: 45, cat: "Fruits & vegetables" },
+          { id: "mp_rce", em: "🍚", nm: "Fortune Everyday Basmati Rice", wt: "5 kg", pr: 149, was: 180, cat: "Atta, Rice & Dals" },
+          { id: "mp_crd", em: "🫙", nm: "Mother Dairy Fresh Curd", wt: "400 g", pr: 52, was: 65, cat: "Dairy,Bread & Eggs" },
+          { id: "mp_spc", em: "🧂", nm: "Everest Shahi Biryani Masala", wt: "50 g", pr: 45, was: 55, cat: "Masala & Dry Fruits" }
+        ];
+
+        let addedCount = 0;
+        mealItems.forEach(item => {
+          const key = `meal-${item.id}`;
+          cart.add(key);
+          cartItemsList[key] = { em: item.em, nm: item.nm, wt: item.wt, pr: `₹${item.pr}`, was: item.was ? `₹${item.was}` : "", cat: item.cat };
+          addedCount++;
+        });
+
+        updateCartTotal();
+        if (btn) {
+          btn.innerHTML = "✓ ADDED ALL INGREDIENTS TO CART!";
+          btn.style.background = "#059669";
+        }
+        toast(`🛒 Added all ${addedCount} meal ingredients (Paneer, Tomatoes, Onions, Rice, Curd, Spices) to cart! 🎉`);
+      };
+
       function getOfflineChatResponse(query) {
         const ql = query.toLowerCase();
         const area = getAreaName();
+
+        // 0M. Complete Meal Generation & Dinner Planning
+        if (ql.includes("meal") || ql.includes("dinner") || ql.includes("lunch") || ql.includes("ingredient") || ql.includes("plan a dinner") || ql.includes("complete meal")) {
+          return `<b>Plan a dinner for 4 people under ₹600.</b><br><br>` +
+                 `The AI could recommend:<br><br>` +
+                 `• Paneer<br>` +
+                 `• Tomatoes<br>` +
+                 `• Onions<br>` +
+                 `• Rice<br>` +
+                 `• Curd<br>` +
+                 `• Spices<br><br>` +
+                 `With options to:`;
+        }
 
         // 0A. Direct Live Catalog Product Search & Price/Stock Lookup
         const directMatch = masterProductCatalog.find(p => p.nm && ql.includes(p.nm.toLowerCase()));

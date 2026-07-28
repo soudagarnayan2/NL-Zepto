@@ -206,7 +206,22 @@ async def zepto_stream(user_id: str = "anonymous", query: str = "",
         except Exception as exc:
             print(f"[zepto_stream] Agent loop error: {exc}")
             q_lower = query.lower()
-            if "biryani" in q_lower or "briyani" in q_lower or "biriyani" in q_lower:
+            if any(k in q_lower for k in ["meal", "dinner", "lunch", "ingredient", "plan"]):
+                fallback_text = (
+                    "Plan a dinner for 4 people under ₹600.\n\n"
+                    "The AI could recommend:\n\n"
+                    "• Paneer\n"
+                    "• Tomatoes\n"
+                    "• Onions\n"
+                    "• Rice\n"
+                    "• Curd\n"
+                    "• Spices\n\n"
+                    "With options to:\n\n"
+                    "• Add All\n"
+                    "• Replace Items\n"
+                    "• Change Cuisine"
+                )
+            elif "biryani" in q_lower or "briyani" in q_lower or "biriyani" in q_lower:
                 fallback_text = (
                     "🍲 **Authentic Royal Dum Biryani Prep Kit**:\n"
                     "Cooking homemade Biryani? Get long-grain Basmati Rice, Everest Shahi Biryani Masala, Pure Cow Ghee, Fresh Curd, Ginger-Garlic Paste, Fresh Chicken/Paneer & Mint delivered in 8 mins!"
