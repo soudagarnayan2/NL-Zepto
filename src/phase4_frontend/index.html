@@ -5651,7 +5651,23 @@
     `;
         }
 
-        if (ql.includes("replace") || ql.includes("swap") || botContent.includes("Replaced Meal Plan")) {
+        if (ql.includes("i have") || botContent.includes("Custom Recipe from Your Ingredients")) {
+          botContent += `
+      <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
+        <button onclick="addMissingIngredientsToCart(this)" style="width:100%; background:linear-gradient(135deg,#16A34A,#15803D); color:#fff; border:none; font-size:11px; font-weight:900; padding:8px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.25);">
+          🛒 Add Missing Ingredients (Cow Ghee & Everest Masala - ₹193)
+        </button>
+        <div style="display:flex; gap:6px;">
+          <button onclick="sendChatMessage('Swap recipe for my ingredients')" style="flex:1; background:#FFFBEB; border:1px solid #FCD34D; color:#B45309; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
+            🔄 Swap Recipe
+          </button>
+          <button onclick="sendChatMessage('Vegetarian alternative for recipe')" style="flex:1; background:#F0FDF4; border:1px solid #86EFAC; color:#15803D; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
+            🌱 Vegetarian Alternative
+          </button>
+        </div>
+      </div>
+    `;
+        } else if (ql.includes("replace") || ql.includes("swap") || botContent.includes("Replaced Meal Plan")) {
           botContent += `
       <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
         <button onclick="addReplacedMealComboToCart(this)" style="width:100%; background:linear-gradient(135deg,#16A34A,#15803D); color:#fff; border:none; font-size:11px; font-weight:900; padding:8px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.25);">
@@ -5742,7 +5758,24 @@
           btn.innerHTML = "✓ ADDED ALL INGREDIENTS TO CART!";
           btn.style.background = "#059669";
         }
-        toast(`Awesome! Your dinner basket is ready in your cart.`);
+      window.addMissingIngredientsToCart = function (btn) {
+        const missing = [
+          { id: "ms_ghe", em: "🧈", nm: "Amul Pure Cow Ghee Jar", wt: "200 ml", pr: 145, was: 160, cat: "Dairy,Bread & Eggs" },
+          { id: "ms_mas", em: "🧂", nm: "Everest Shahi Paneer Masala", wt: "50 g", pr: 48, was: 55, cat: "Masala & Dry Fruits" }
+        ];
+
+        missing.forEach(item => {
+          const key = `msg-${item.id}`;
+          cart.add(key);
+          cartItemsList[key] = { em: item.em, nm: item.nm, wt: item.wt, pr: `₹${item.pr}`, was: item.was ? `₹${item.was}` : "", cat: item.cat };
+        });
+
+        updateCartTotal();
+        if (btn) {
+          btn.innerHTML = "✓ ADDED MISSING INGREDIENTS TO CART!";
+          btn.style.background = "#059669";
+        }
+        toast(`Awesome! Added missing recipe ingredients to your cart.`);
       };
 
       window.addReplacedMealComboToCart = function (btn) {
@@ -5884,6 +5917,21 @@
             `• <b>Higher Protein Options</b>: Amul Fresh Malai Paneer (18g protein/100g) & Organic Moong Dal<br>` +
             `• <b>Lower Sugar Options</b>: Epigamia Plain Unsweetened Greek Yogurt & Almond Milk<br><br>` +
             `<i>⚠️ Disclaimer: Please consult a qualified healthcare professional or dietitian for personalized medical advice.</i><br><br>` +
+            `With options to:`;
+        }
+
+        // Ingredient-Based Recipe Protocol: Generates recipe using given ingredients, identifies missing ingredients, cooking steps, YouTube link
+        if (ql.includes("i have") || ql.includes("ingredients:") || ql.includes("using ingredients") || ql.includes("with ingredients")) {
+          return `🍳 <b>Custom Recipe from Your Ingredients</b>:<br><br>` +
+            `<b>Shahi Paneer & Jeera Rice Delight</b> (Prep time: 20 mins)<br><br>` +
+            `<b>Cooking Instructions:</b><br>` +
+            `1. Sauté onions & tomatoes in Ghee until golden brown.<br>` +
+            `2. Blend into smooth gravy, add paneer cubes & spices.<br>` +
+            `3. Temper Basmati rice with cumin seeds & serve hot.<br><br>` +
+            `🛒 <b>Missing Ingredients (In stock on Zepto):</b><br>` +
+            `• Amul Cow Ghee Jar (200ml) — ₹145<br>` +
+            `• Everest Shahi Paneer Masala (50g) — ₹48<br><br>` +
+            `▶️ <b>Watch Video Tutorial</b>: <a href="https://www.youtube.com/results?search_query=Shahi+Paneer+Jeera+Rice+Recipe" target="_blank" style="color:var(--zepto-purple-2);font-weight:800;text-decoration:underline;">YouTube Recipe Video Guide 🎥</a><br><br>` +
             `With options to:`;
         }
 
