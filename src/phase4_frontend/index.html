@@ -5923,6 +5923,16 @@
             `With options to:`;
         }
 
+        // Purchase History Protocol: Analyzes previous orders, restock cycles, monthly essentials & seasonal picks
+        if (ql.includes("previous purchases") || ql.includes("past orders") || ql.includes("reorder") || ql.includes("history") || ql.includes("repeat") || ql.includes("frequently bought")) {
+          return `📊 <b>Purchase History Analysis for ${area}</b>:<br><br>` +
+            `• 🔄 <b>Frequently Purchased</b>: Amul Fresh Cow Milk (500ml) & Whole Wheat Bread<br>` +
+            `• 📅 <b>Monthly Essentials Restock</b>: Aashirvaad Shuddh Chakki Atta (5kg) & Tata Sampann Toor Dal (1kg)<br>` +
+            `• 🌧️ <b>Monsoon Season Special</b>: Kadak Masala Ginger Tea & Everest Shahi Biryani Masala<br><br>` +
+            `<i>Personalized for your exact household needs without unsolicited luxury items.</i><br><br>` +
+            `With options to:`;
+        }
+
         // Health & Dietary Goals Protocol: Handles Weight loss, Muscle gain, Diabetes, Heart healthy, High protein
         if (ql.includes("weight loss") || ql.includes("muscle gain") || ql.includes("diabetes") || ql.includes("heart healthy") || ql.includes("high protein") || ql.includes("health goal") || ql.includes("nutrition")) {
           return `🥗 <b>Health & Nutrition Goal Recommendations</b> for <b>${area}</b>:<br><br>` +

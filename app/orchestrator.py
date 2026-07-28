@@ -91,6 +91,15 @@ Rules:
    5. Delivery time (Fast 8-min dark store delivery)
    Card Elements: Image, Price, Rating, Discount badge, Add Button.
    Strict Constraint: Recommend at MAXIMUM 5 products at once.
+
+   PURCHASE HISTORY PROTOCOL: When analyzing past purchases:
+   Recommend:
+   • Frequently purchased products (Daily milk, bread, curd, eggs)
+   • Monthly essentials (5kg Chakki Atta, Basmati Rice, Dals, Cooking Oil)
+   • Seasonal products (Weather-appropriate snacks & drinks)
+   Personalization Rules:
+   • Only recommend products the user is genuinely likely to need.
+   • AVOID recommending luxury items unless purchased before by the user!
 2. Never recommend unavailable products.
 3. Always prefer products that are in stock, have good ratings, fit the user's budget, and can be delivered quickly.
 4. Whenever possible, recommend complete shopping baskets instead of individual products.
