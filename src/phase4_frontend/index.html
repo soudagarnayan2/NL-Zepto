@@ -5888,6 +5888,20 @@
             `What are we shopping for today?`;
         }
 
+        // Rule: Alcohol restriction for minors
+        if (ql.includes("alcohol") || ql.includes("beer") || ql.includes("wine") || ql.includes("whisky") || ql.includes("liquor") || ql.includes("vodka") || ql.includes("rum")) {
+          return `🔞 <b>Age Restriction Policy</b>:<br><br>` +
+            `Zepto AI cannot recommend or display alcohol products to minors. Please verify legal drinking age compliance.<br><br>` +
+            `Explore our refreshing non-alcoholic mocktail mixers, juices, and cold brews instead!`;
+        }
+
+        // Rule: No medical advice or medical claims
+        if (ql.includes("cure") || ql.includes("treat disease") || ql.includes("medical advice") || ql.includes("prescription medicine")) {
+          return `🩺 <b>Medical Advice Disclaimer</b>:<br><br>` +
+            `Zepto AI does not provide medical advice or make health claims. Please consult a qualified doctor or healthcare professional for medical guidance.<br><br>` +
+            `I can help you find fresh groceries and healthy nutrition products!`;
+        }
+
         // Rule 1: Follow-up question when dinner/food information is missing (5 Parameters: People, Cuisine, Budget, Diet, Cooking time)
         if (ql === "dinner" || ql === "cook dinner" || ql === "make dinner" || ql === "plan dinner" || ql === "meal" || ql === "food ideas" || ql === "food idea" || ql === "recipe ideas") {
           return `🍲 <b>Food Ideas & Recipe Discovery Protocol</b>:<br><br>` +
