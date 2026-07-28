@@ -206,7 +206,36 @@ async def zepto_stream(user_id: str = "anonymous", query: str = "",
         except Exception as exc:
             print(f"[zepto_stream] Agent loop error: {exc}")
             q_lower = query.lower()
-            if any(k in q_lower for k in ["meal", "dinner", "lunch", "ingredient", "plan"]):
+            if "replace" in q_lower or "swap" in q_lower:
+                fallback_text = (
+                    "🔄 Replaced Meal Plan (Dinner for 4 under ₹600)\n\n"
+                    "Substituted Paneer & Basmati Rice with Fresh Mushrooms / Chicken, Wheat Atta & Yellow Moong Dal:\n\n"
+                    "• Fresh Mushrooms / Chicken Cut\n"
+                    "• Whole Wheat Chakki Atta (Fresh Chapatis)\n"
+                    "• Organic Yellow Moong Dal\n"
+                    "• Hybrid Tomatoes & Green Capsicum\n"
+                    "• Fresh Red Onions\n"
+                    "• Pure Cow Ghee & Whole Spices\n\n"
+                    "With options to:\n\n"
+                    "• Add Replaced Ingredients\n"
+                    "• Swap back to Paneer\n"
+                    "• Change Cuisine"
+                )
+            elif "cuisine" in q_lower:
+                fallback_text = (
+                    "🍲 Select Your Preferred Cuisine (Dinner for 4 under ₹600)\n\n"
+                    "Choose a fresh regional or international dinner option:\n\n"
+                    "• 🇮🇳 North Indian (₹520): Shahi Paneer, Dal Makhani, Whole Wheat Roti, Jeera Rice\n"
+                    "• 🌴 South Indian (₹410): Dosa & Idli Batter, Sambhar Veggies, Coconut & Filter Coffee\n"
+                    "• 🥢 Indo-Chinese (₹380): Hakka Noodles, Chilli Paneer Cubes, Soy & Garlic Sauce\n"
+                    "• 🍝 Italian / Continental (₹460): Penne Pasta, Amul Butter, Garlic Bread & Cheese\n\n"
+                    "With options to:\n\n"
+                    "• Add North Indian\n"
+                    "• Add South Indian\n"
+                    "• Add Indo-Chinese\n"
+                    "• Add Italian"
+                )
+            elif any(k in q_lower for k in ["meal", "dinner", "lunch", "ingredient", "plan"]):
                 fallback_text = (
                     "Plan a dinner for 4 people under ₹600.\n\n"
                     "The AI could recommend:\n\n"

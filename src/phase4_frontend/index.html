@@ -5522,7 +5522,42 @@
     `;
         }
 
-        if (ql.includes("meal") || ql.includes("dinner") || ql.includes("lunch") || ql.includes("ingredient") || botContent.includes("With options to:")) {
+        if (ql.includes("replace") || ql.includes("swap") || botContent.includes("Replaced Meal Plan")) {
+          botContent += `
+      <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
+        <button onclick="addReplacedMealComboToCart(this)" style="width:100%; background:linear-gradient(135deg,#16A34A,#15803D); color:#fff; border:none; font-size:11px; font-weight:900; padding:8px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.25);">
+          🛒 Add Replaced Ingredients (Chicken/Mushrooms, Atta, Moong Dal, Tomatoes, Onions, Ghee)
+        </button>
+        <div style="display:flex; gap:6px;">
+          <button onclick="sendChatMessage('Plan a dinner for 4 people under ₹600')" style="flex:1; background:#FFFBEB; border:1px solid #FCD34D; color:#B45309; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
+            🧀 Swap back to Paneer
+          </button>
+          <button onclick="sendChatMessage('Change cuisine for meal plan')" style="flex:1; background:#FBF0FF; border:1px solid #E9D5FF; color:#7E22CE; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
+            🍲 Change Cuisine
+          </button>
+        </div>
+      </div>
+    `;
+        } else if (ql.includes("cuisine") || botContent.includes("Select Your Preferred Cuisine")) {
+          botContent += `
+      <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+          <button onclick="addCuisineComboToCart('north')" style="background:#FFFBEB; border:1px solid #FCD34D; color:#B45309; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
+            🇮🇳 Add North Indian (₹520)
+          </button>
+          <button onclick="addCuisineComboToCart('south')" style="background:#F0FDF4; border:1px solid #86EFAC; color:#15803D; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
+            🌴 Add South Indian (₹410)
+          </button>
+          <button onclick="addCuisineComboToCart('chinese')" style="background:#FEF2F2; border:1px solid #FCA5A5; color:#B91C1C; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
+            🥢 Add Indo-Chinese (₹380)
+          </button>
+          <button onclick="addCuisineComboToCart('italian')" style="background:#FBF0FF; border:1px solid #E9D5FF; color:#7E22CE; font-size:10px; font-weight:900; padding:7px; border-radius:8px; cursor:pointer;">
+            🍝 Add Italian (₹460)
+          </button>
+        </div>
+      </div>
+    `;
+        } else if (ql.includes("meal") || ql.includes("dinner") || ql.includes("lunch") || ql.includes("ingredient") || botContent.includes("With options to:")) {
           botContent += `
       <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
         <button onclick="addMealPlanComboToCart(this)" style="width:100%; background:linear-gradient(135deg,#16A34A,#15803D); color:#fff; border:none; font-size:11px; font-weight:900; padding:8px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.25);">
@@ -5581,12 +5616,101 @@
         toast(`🛒 Added all ${addedCount} meal ingredients (Paneer, Tomatoes, Onions, Rice, Curd, Spices) to cart! 🎉`);
       };
 
+      window.addReplacedMealComboToCart = function(btn) {
+        const replacedItems = [
+          { id: "rm_chk", em: "🍗", nm: "Fresh Chicken Curry Cut", wt: "500 g", pr: 199, was: 240, cat: "Meat, Fish & Eggs" },
+          { id: "rm_att", em: "🌾", nm: "Aashirvaad Shuddh Chakki Atta", wt: "5 kg", pr: 245, was: 285, cat: "Atta, Rice & Dals" },
+          { id: "rm_dal", em: "🫘", nm: "Organic Yellow Moong Dal", wt: "500 g", pr: 89, was: 105, cat: "Atta, Rice & Dals" },
+          { id: "rm_tom", em: "🍅", nm: "Farm Fresh Hybrid Tomatoes", wt: "1 kg", pr: 38, was: 45, cat: "Fruits & vegetables" },
+          { id: "rm_oni", em: "🧅", nm: "Fresho Fresh Red Onions", wt: "1 kg", pr: 32, was: 45, cat: "Fruits & vegetables" },
+          { id: "rm_ghe", em: "🧈", nm: "Amul Pure Cow Ghee Jar", wt: "200 ml", pr: 145, was: 160, cat: "Dairy,Bread & Eggs" }
+        ];
+
+        let addedCount = 0;
+        replacedItems.forEach(item => {
+          const key = `rep-${item.id}`;
+          cart.add(key);
+          cartItemsList[key] = { em: item.em, nm: item.nm, wt: item.wt, pr: `₹${item.pr}`, was: item.was ? `₹${item.was}` : "", cat: item.cat };
+          addedCount++;
+        });
+
+        updateCartTotal();
+        if (btn) {
+          btn.innerHTML = "✓ ADDED REPLACED INGREDIENTS TO CART!";
+          btn.style.background = "#059669";
+        }
+        toast(`🛒 Added all ${addedCount} replaced meal ingredients to cart! 🎉`);
+      };
+
+      window.addCuisineComboToCart = function(type) {
+        const cuisineMap = {
+          north: { name: "North Indian Dinner", items: [
+            { id: "c_pnr", em: "🧀", nm: "Amul Fresh Malai Paneer", wt: "200 g", pr: 95, cat: "Dairy,Bread & Eggs" },
+            { id: "c_dal", em: "🫘", nm: "Tata Sampann Toor Dal", wt: "1 kg", pr: 175, cat: "Atta, Rice & Dals" },
+            { id: "c_att", em: "🌾", nm: "Aashirvaad Shuddh Chakki Atta", wt: "5 kg", pr: 245, cat: "Atta, Rice & Dals" }
+          ]},
+          south: { name: "South Indian Dinner", items: [
+            { id: "c_btr", em: "🥣", nm: "iD Fresh Dosa & Idli Batter", wt: "1 kg", pr: 99, cat: "Dairy,Bread & Eggs" },
+            { id: "c_dal", em: "🫘", nm: "Organic Yellow Moong Dal", wt: "500 g", pr: 89, cat: "Atta, Rice & Dals" },
+            { id: "c_cof", em: "☕", nm: "Davidoff Instant Coffee", wt: "100 g", pr: 225, cat: "Tea, Coffee & More" }
+          ]},
+          chinese: { name: "Indo-Chinese Dinner", items: [
+            { id: "c_ndl", em: "🍜", nm: "Masala Noodles Pack", wt: "280 g", pr: 55, cat: "Packaged Food" },
+            { id: "c_pnr", em: "🧀", nm: "Amul Fresh Malai Paneer", wt: "200 g", pr: 95, cat: "Dairy,Bread & Eggs" },
+            { id: "c_sau", em: "🥢", nm: "Chilli Soy Garlic Sauce", wt: "200 g", pr: 65, cat: "Breakfast & Sauce" }
+          ]},
+          italian: { name: "Italian Dinner", items: [
+            { id: "c_pst", em: "🍝", nm: "Penne Durum Wheat Pasta", wt: "500 g", pr: 125, cat: "Packaged Food" },
+            { id: "c_btr", em: "🧈", nm: "Amul Butter Pasteurised", wt: "100 g", pr: 56, cat: "Dairy,Bread & Eggs" },
+            { id: "c_brd", em: "🥖", nm: "English Oven Garlic Bread Stick", wt: "150 g", pr: 55, cat: "Dairy,Bread & Eggs" }
+          ]}
+        };
+
+        const choice = cuisineMap[type];
+        if (!choice) return;
+
+        let addedCount = 0;
+        choice.items.forEach(item => {
+          const key = `cui-${item.id}`;
+          cart.add(key);
+          cartItemsList[key] = { em: item.em, nm: item.nm, wt: item.wt, pr: `₹${item.pr}`, cat: item.cat };
+          addedCount++;
+        });
+
+        updateCartTotal();
+        toast(`🛒 Added ${choice.name} combo to cart! 🎉`);
+      };
+
       function getOfflineChatResponse(query) {
         const ql = query.toLowerCase();
         const area = getAreaName();
 
+        // 0R. Replace Items in Meal Plan
+        if (ql.includes("replace") || ql.includes("swap")) {
+          return `🔄 <b>Replaced Meal Plan (Dinner for 4 under ₹600)</b><br><br>` +
+                 `Substituted Paneer & Basmati Rice with Fresh Mushrooms / Chicken, Wheat Atta & Yellow Moong Dal:<br><br>` +
+                 `• Fresh Mushrooms / Chicken Cut<br>` +
+                 `• Whole Wheat Chakki Atta (Fresh Chapatis)<br>` +
+                 `• Organic Yellow Moong Dal<br>` +
+                 `• Hybrid Tomatoes & Green Capsicum<br>` +
+                 `• Fresh Red Onions<br>` +
+                 `• Pure Cow Ghee & Whole Spices<br><br>` +
+                 `With options to:`;
+        }
+
+        // 0C. Change Cuisine for Meal Plan
+        if (ql.includes("cuisine")) {
+          return `🍲 <b>Select Your Preferred Cuisine (Dinner for 4 under ₹600)</b><br><br>` +
+                 `Choose a fresh regional or international dinner option:<br><br>` +
+                 `• <b>🇮🇳 North Indian (₹520)</b>: Shahi Paneer, Dal Makhani, Whole Wheat Roti, Jeera Rice<br>` +
+                 `• <b>🌴 South Indian (₹410)</b>: Dosa & Idli Batter, Sambhar Veggies, Coconut & Filter Coffee<br>` +
+                 `• <b>🥢 Indo-Chinese (₹380)</b>: Hakka Noodles, Chilli Paneer Cubes, Soy & Garlic Sauce<br>` +
+                 `• <b>🍝 Italian / Continental (₹460)</b>: Penne Pasta, Amul Butter, Garlic Bread & Cheese<br><br>` +
+                 `With options to:`;
+        }
+
         // 0M. Complete Meal Generation & Dinner Planning
-        if (ql.includes("meal") || ql.includes("dinner") || ql.includes("lunch") || ql.includes("ingredient") || ql.includes("plan a dinner") || ql.includes("complete meal")) {
+        if (ql.includes("meal") || ql.includes("dinner") || ql.includes("lunch") || ql.includes("ingredient") || ql.includes("plan")) {
           return `<b>Plan a dinner for 4 people under ₹600.</b><br><br>` +
                  `The AI could recommend:<br><br>` +
                  `• Paneer<br>` +
