@@ -5842,13 +5842,16 @@
             `What are we shopping for today?`;
         }
 
-        // Rule 1: Follow-up question when dinner information is missing
-        if (ql === "dinner" || ql === "cook dinner" || ql === "make dinner" || ql === "plan dinner" || ql === "meal") {
-          return `🍲 I'd love to build a complete dinner basket for you! To get it just right:<br><br>` +
-            `1. How many people?<br>` +
-            `2. What is your budget limit?<br>` +
-            `3. Vegetarian or Non-Vegetarian?<br><br>` +
-            `Or tap below to view our popular dinner for 4 under ₹600:`;
+        // Rule 1: Follow-up question when dinner/food information is missing (5 Parameters: People, Cuisine, Budget, Diet, Cooking time)
+        if (ql === "dinner" || ql === "cook dinner" || ql === "make dinner" || ql === "plan dinner" || ql === "meal" || ql === "food ideas" || ql === "food idea" || ql === "recipe ideas") {
+          return `🍲 <b>Food Ideas & Recipe Discovery Protocol</b>:<br><br>` +
+            `Before generating your recipe card & ingredient basket, please tell me:<br>` +
+            `1. <b>Number of people</b> (e.g. 4 people)<br>` +
+            `2. <b>Cuisine</b> (e.g. North Indian, South Indian, Indo-Chinese, Italian)<br>` +
+            `3. <b>Budget limit</b> (e.g. under ₹600)<br>` +
+            `4. <b>Diet</b> (Vegetarian / Non-Veg / Vegan / Jain)<br>` +
+            `5. <b>Cooking time limit</b> (e.g. 25 mins)<br><br>` +
+            `Or tap below to view our ready dinner plan for 4 people under ₹600!`;
         }
 
         // 0R. Replace Items in Meal Plan
