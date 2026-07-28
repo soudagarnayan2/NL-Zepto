@@ -1,0 +1,22 @@
+# Python compilation caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment configuration files (contains API secrets)
+.env
+
+# Local database and queue storage folders
+data/
+db/
+queue/
+
+# Project dependencies environment
+.venv/
+env/
+venv/
+ENV/
+dist/
+build/
+*.egg-info/

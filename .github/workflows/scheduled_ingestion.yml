@@ -1,0 +1,62 @@
+name: Scheduled Feedback Ingestion
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC (05:30 IST)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    # Allow manual invocation from GitHub Actions UI
+    inputs:
+      limit:
+        description: 'Scrape limit per source'
+        required: false
+        default: '10'
+        type: string
+
+jobs:
+  ingest:
+    name: Run Ingestion Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: 'src/requirements.txt'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r src/requirements.txt
+
+      - name: Run E2E Ingestion Pipeline
+        env:
+          PYTHONPATH: src
+          # In real deployments, configure DATABASE_URL or KAFKA_BOOTSTRAP_SERVERS here if needed
+        run: |
+          LIMIT_VAL="${{ github.event.inputs.limit }}"
+          if [ -z "$LIMIT_VAL" ]; then
+            LIMIT_VAL="10"
+          fi
+          python src/phase1_ingestion/phase1_5_orchestration/run_pipeline.py --limit "$LIMIT_VAL"
+
+      - name: Upload SQLite Database Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zepto-staging-database
+          path: data/db/zepto_discovery.db
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload Clean Stream JSONL Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zepto-clean-stream
+          path: data/processed/feedbacks_stream_output.jsonl
+          if-no-files-found: warn
+          retention-days: 7

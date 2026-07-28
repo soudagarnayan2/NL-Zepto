@@ -1,0 +1,10 @@
+google-play-scraper
+requests
+beautifulsoup4
+pydantic
+urllib3
+fastapi
+uvicorn
+httpx
+python-dotenv
+sentence-transformers
