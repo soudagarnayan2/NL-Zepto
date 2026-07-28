@@ -5829,18 +5829,26 @@
       };
 
       function getOfflineChatResponse(query) {
-        const ql = query.toLowerCase();
+        const ql = query.toLowerCase().trim();
         const area = getAreaName();
 
         // 0G. Greeting & Conversational Identity
         if (ql.includes("hi") || ql.includes("hello") || ql.includes("hey") || ql.includes("namaste") || ql.includes("who are you") || ql.includes("what can you do") || ql.includes("help") || ql.includes("start")) {
-          return `👋 <b>Hello! I'm Ask Zepto AI — your 10-minute grocery, meal planner & lifestyle assistant!</b><br><br>` +
-            `I can help you with:<br>` +
-            `• 🍲 <b>Meal & Dinner Planning</b> (under ₹600 with 1-tap combo add)<br>` +
-            `• 🥪 <b>Recipe & Ingredient Pairings</b> (Sandwich, Biryani, Puran Poli, Misal Pav, Ramen)<br>` +
-            `• ⚡ <b>8-Minute Delivery & Live Price Checks</b> across 38+ categories in <b>${area}</b><br>` +
-            `• 🥗 <b>Dietary Bundles</b> (High Protein, Keto, Vegan, Sugar-Free)<br><br>` +
-            `Ask me any question or tap a suggestion chip below to start!`;
+          return `👋 <b>Hi! I'm Zepto AI — your friendly & intelligent grocery shopping assistant.</b><br><br>` +
+            `My goal is to help you shop faster with fewer clicks in <b>${area}</b>!<br><br>` +
+            `• Build grocery lists & complete shopping baskets<br>` +
+            `• Recommend top-rated in-stock items & recipes<br>` +
+            `• Suggest healthier alternatives & save you money<br><br>` +
+            `What are we shopping for today?`;
+        }
+
+        // Rule 1: Follow-up question when dinner information is missing
+        if (ql === "dinner" || ql === "cook dinner" || ql === "make dinner" || ql === "plan dinner" || ql === "meal") {
+          return `🍲 I'd love to build a complete dinner basket for you! To get it just right:<br><br>` +
+            `1. How many people?<br>` +
+            `2. What is your budget limit?<br>` +
+            `3. Vegetarian or Non-Vegetarian?<br><br>` +
+            `Or tap below to view our popular dinner for 4 under ₹600:`;
         }
 
         // 0R. Replace Items in Meal Plan
