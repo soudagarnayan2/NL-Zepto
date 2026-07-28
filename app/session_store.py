@@ -21,6 +21,13 @@ class SessionStore:
                     "nudge_shown_this_session": False,
                     "recently_dismissed": [],
                 },
+                "user_preferences": {
+                    "preferred_brands": [],
+                    "diet": None,
+                    "budget": None,
+                    "family_size": None,
+                    "favorite_cuisines": [],
+                },
             }
         return self._store[session_id]
 

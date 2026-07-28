@@ -4476,6 +4476,15 @@
         };
       }
 
+      // Session Memory Store for Zepto AI (Retains Preferred Brands, Diet, Budget, Family Size, Cuisines during session)
+      const userSessionPreferences = {
+        preferredBrands: ["Amul", "Aashirvaad", "Tata Sampann", "Mother Dairy", "Everest"],
+        diet: "Vegetarian",
+        budget: "₹600",
+        familySize: "4 people",
+        favoriteCuisines: ["North Indian", "South Indian", "Indo-Chinese", "Italian"]
+      };
+
       function openChat(initialMsg = null) {
         updateChatWelcomeMessage();
         $("#chat-overlay").classList.add("show");
