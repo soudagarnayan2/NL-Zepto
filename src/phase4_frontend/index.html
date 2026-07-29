@@ -6185,9 +6185,14 @@
           return `Feeling thirsty? 🥤 Try <b>Cold Drinks & Juices</b>, <b>Tea, Coffee & More</b>, and <b>Zepto Cafe</b> — 4,200+ orders near ${area} this week.`;
         }
 
-        // Intelligent Generic Conversational Assistant
-        return `🤖 <b>Ask Zepto AI Analysis for "${query}"</b>:<br><br>` +
-          `I've analyzed your prompt for <b>${area}</b>! Below are live top-rated items, pairing suggestions, and categories delivered in 8 mins:`;
+        // Intelligent Zero Match Fallback Protocol (Never says "No products found")
+        return `🔍 <b>No exact match for "${query}"</b> in <b>${area}</b> right now.<br><br>` +
+          `Here are great ways to find what you need:<br>` +
+          `• 📍 <b>Nearby Alternatives</b>: Top related picks in adjacent categories below<br>` +
+          `• 🏷️ <b>Different Brands</b>: Popular matching items from trusted local brands<br>` +
+          `• 📈 <b>Higher Budget Options</b>: Premium pack sizes available for delivery<br>` +
+          `• 📉 <b>Lower Budget Options</b>: Value economy packs in stock<br><br>` +
+          `🔔 <i>Tap "Notify Me" below to get alerted when this item is restocked!</i>`;
       }
 
       /* Map a query to relevant product categories to show as cards */
