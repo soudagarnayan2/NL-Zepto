@@ -4905,6 +4905,15 @@
         { id: "mp6", em: "🧈", nm: "Amul Butter Pasteurised", wt: "100 g", pr: 55, was: 62, cals: "~102 kcal / tbsp", cat: "Dairy,Bread & Eggs", img: "https://images.bigbasket.com/media/uploads/p/l/40000755-1-amul-butter.jpg" }
       ];
 
+      const monsoonSnacksIngredients = [
+        { id: "ms1", em: "☕", nm: "Red Label Masala Ginger Tea", wt: "250 g", pr: 140, was: 165, cals: "~45 kcal/cup", cat: "Tea, Coffee & More", img: "https://images.bigbasket.com/media/uploads/p/l/40000774_2-amul-taaza-toned-milk.jpg" },
+        { id: "ms2", em: "🌽", nm: "Sweet Corn Whole Cob", wt: "2 pcs", pr: 49, was: 65, cals: "~90 kcal/cob", cat: "Fruits & vegetables", img: "https://upload.wikimedia.org/wikipedia/commons/8/83/Jackfruit_or_Papaya_fruits_for_sale.jpg" },
+        { id: "ms3", em: "🧅", nm: "Fresho Fresh Red Onions (for Pakodas)", wt: "1 kg", pr: 32, was: 45, cals: "~40 kcal/100g", cat: "Fruits & vegetables", img: "https://upload.wikimedia.org/wikipedia/commons/8/80/Onions_together.jpg" },
+        { id: "ms4", em: "🥟", nm: "Prasuma Steamed Veg Momos", wt: "10 pcs", pr: 179, was: 220, cals: "~180 kcal/serv", cat: "Frozen Food", img: "https://images.bigbasket.com/media/uploads/p/l/40002672_3-mothers-recipe-green-chutney.jpg" },
+        { id: "ms5", em: "🧈", nm: "Amul Butter (for Corn & Vada Pav)", wt: "100 g", pr: 56, was: 60, cals: "~102 kcal/tbsp", cat: "Dairy,Bread & Eggs", img: "https://images.bigbasket.com/media/uploads/p/l/40000755-1-amul-butter.jpg" },
+        { id: "ms6", em: "🍟", nm: "McCain Aloo Tikki Mazedaar", wt: "400 g", pr: 95, was: 120, cals: "~140 kcal/serv", cat: "Frozen Food", img: "https://images.bigbasket.com/media/uploads/p/l/40000755-1-amul-butter.jpg" }
+      ];
+
       const biryaniPrepIngredients = [
         { id: "bp1", em: "🍚", nm: "India Gate Royal Basmati Rice", wt: "1 kg", pr: 149, was: 180, cals: "~350 kcal/100g", cat: "Atta, Rice & Dals", img: "https://images.bigbasket.com/media/uploads/p/l/40000244_6-india-gate-basmati-rice-feast-rozzana.jpg" },
         { id: "bp2", em: "🧂", nm: "Everest Shahi Biryani Masala", wt: "50 g", pr: 45, was: 55, cals: "~15 kcal/tbsp", cat: "Masala & Dry Fruits", img: "https://images.bigbasket.com/media/uploads/p/l/240066_12-everest-shahi-biryani-masala.jpg" },
@@ -5730,8 +5739,36 @@
         const isPuranPoliQuery = (ql.includes("puran") || ql.includes("poli") || ql.includes("puranpoli"));
         const isBreadQuery = (ql.includes("bread") || ql.includes("sandwich") || ql.includes("pairing") || ql.includes("toast"));
         const isCafeQuery = (ql.includes("cafe") || ql.includes("zepto cafe") || ql.includes("coffee") || ql.includes("cold brew") || ql.includes("chai") || ql.includes("croissant") || ql.includes("samosa") || ql.includes("muffin"));
+        const isMonsoonQuery = (ql.includes("monsoon") || ql.includes("rain") || ql.includes("cravings") || ql.includes("vada pav") || ql.includes("corn") || ql.includes("bhajji") || ql.includes("pakoda"));
 
-        if (isBiryaniQuery) {
+        if (isMonsoonQuery) {
+          botContent += `
+    <div style="margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px;">
+      <div style="font-size: 11px; font-weight: 900; color: #D97706; margin-bottom: 8px; display:flex; align-items:center; gap:5px;">
+        🌧️ Monsoon Evening Snacks & Rainy Cravings (Delivered in 8 Mins):
+      </div>
+      <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch;">
+  `;
+          monsoonSnacksIngredients.forEach(item => {
+            const itemKey = `ms-${item.id}`;
+            const isAdded = cart.has(itemKey);
+            botContent += `
+      <div style="flex: 0 0 120px; background: #fff; border: 1.5px solid #FDE68A; border-radius: 14px; padding: 8px 6px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 2px 8px rgba(217,119,6,0.08); position:relative;">
+        <span style="position:absolute; top:4px; right:4px; font-size:7.5px; font-weight:900; background:#FEF3C7; color:#D97706; padding:1px 4px; border-radius:4px;">${item.cals}</span>
+        <div style="margin-top:10px; margin-bottom:4px; background:#FFFBEB; width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+          ${item.img ? `<img src="${item.img}" alt="${item.nm}" style="width:100%; height:100%; object-fit:contain; padding:2px;" onerror="this.outerHTML='<span style=\\'font-size:26px;\\'>${item.em}</span>'"/>` : `<span style="font-size: 26px;">${item.em}</span>`}
+        </div>
+        <div style="font-size: 9.5px; font-weight: 800; line-height: 1.25; height: 26px; overflow: hidden; margin-bottom: 2px; color: var(--ink); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${item.nm}</div>
+        <div style="font-size: 8.5px; color: var(--ink-3); font-weight: 700; margin-bottom: 4px;">${item.wt}</div>
+        <div style="font-size: 10.5px; font-weight: 900; color: var(--zepto-purple-2); margin-bottom: 6px; margin-top: auto;">
+          ₹${item.pr}${item.was ? ` <s style="font-size:8px;color:var(--ink-3);font-weight:700;">₹${item.was}</s>` : ""}
+        </div>
+        <button class="add${isAdded ? ' in' : ''}" onclick="addMonsoonSnackToCart(this, '${item.id}')" style="width:100%;font-size:9px;padding:4px 0;border-radius:8px;">${isAdded ? '✓ ADDED' : '+ ADD'}</button>
+      </div>
+    `;
+          });
+          botContent += `</div>`;
+        } else if (isBiryaniQuery) {
           botContent += `
     <div style="margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px;">
       <div style="font-size: 11px; font-weight: 900; color: #D97706; margin-bottom: 8px; display:flex; align-items:center; gap:5px;">
@@ -6056,6 +6093,31 @@
           btn.innerHTML = "✓ ADDED ALL INGREDIENTS TO CART!";
           btn.style.background = "#059669";
         }
+      };
+
+      window.addMonsoonSnackToCart = function (btn, id) {
+        const item = monsoonSnacksIngredients.find(i => i.id === id);
+        if (!item) return;
+        const key = `ms-${item.id}`;
+
+        if (cart.has(key)) {
+          cart.delete(key);
+          delete cartItemsList[key];
+          if (btn) {
+            btn.classList.remove("in");
+            btn.textContent = "+ ADD";
+          }
+          toast(`Removed ${item.nm} from cart`);
+        } else {
+          cart.add(key);
+          cartItemsList[key] = { em: item.em, nm: item.nm, wt: item.wt, pr: `₹${item.pr}`, was: item.was ? `₹${item.was}` : "", cat: item.cat };
+          if (btn) {
+            btn.classList.add("in");
+            btn.textContent = "✓ ADDED";
+          }
+          toast(`Added ${item.nm} — monsoon treat! 🌧️`);
+        }
+        updateCartTotal();
       };
 
       // ==========================================================================
