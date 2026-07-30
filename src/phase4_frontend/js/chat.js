@@ -23,8 +23,52 @@
         favoriteCuisines: ["North Indian", "South Indian", "Indo-Chinese", "Italian"]
       };
 
+      // Active Preference Ribbon Logic
+      function renderChatPreferenceRibbon() {
+        const ribbon = $("#chat-pref-ribbon");
+        if (!ribbon) return;
+        const eta = (currentLocation && currentLocation.eta) ? currentLocation.eta : "8 mins ⚡";
+        ribbon.innerHTML = `
+          <span class="pref-chip active" title="Express Delivery Speed">⚡ ${eta}</span>
+          <span class="pref-chip ${userSessionPreferences.diet ? 'active' : ''}" onclick="togglePreferencePrompt('diet')" title="Tap to cycle diet preference">🟢 ${userSessionPreferences.diet || 'Any Diet'}</span>
+          <span class="pref-chip ${userSessionPreferences.budget ? 'active' : ''}" onclick="togglePreferencePrompt('budget')" title="Tap to cycle budget limit">💰 ${userSessionPreferences.budget || 'Any Budget'}</span>
+          <span class="pref-chip ${userSessionPreferences.familySize ? 'active' : ''}" onclick="togglePreferencePrompt('familySize')" title="Tap to cycle household size">👥 ${userSessionPreferences.familySize || 'Family Size'}</span>
+          <span class="pref-chip" onclick="resetUserPreferences()" style="margin-left:auto; font-size:9px; color:var(--ink-3);" title="Reset to defaults">Reset ↺</span>
+        `;
+      }
+
+      window.togglePreferencePrompt = function(type) {
+        if (type === 'diet') {
+          const nextDiet = userSessionPreferences.diet === 'Vegetarian' ? 'Non-Vegetarian' : (userSessionPreferences.diet === 'Non-Vegetarian' ? 'Vegan' : 'Vegetarian');
+          userSessionPreferences.diet = nextDiet;
+          if (typeof toast === "function") toast(`Updated diet preference to ${nextDiet} 🥗`);
+        } else if (type === 'budget') {
+          const nextBudget = userSessionPreferences.budget === '₹600' ? '₹400' : (userSessionPreferences.budget === '₹400' ? '₹1000' : '₹600');
+          userSessionPreferences.budget = nextBudget;
+          if (typeof toast === "function") toast(`Updated budget limit to ${nextBudget} 💰`);
+        } else if (type === 'familySize') {
+          const nextSize = userSessionPreferences.familySize === '4 people' ? '2 people' : (userSessionPreferences.familySize === '2 people' ? '1 person' : '4 people');
+          userSessionPreferences.familySize = nextSize;
+          if (typeof toast === "function") toast(`Updated household size to ${nextSize} 👥`);
+        }
+        renderChatPreferenceRibbon();
+        updateChatWelcomeMessage();
+      };
+
+      window.resetUserPreferences = function() {
+        userSessionPreferences.diet = "Vegetarian";
+        userSessionPreferences.budget = "₹600";
+        userSessionPreferences.familySize = "4 people";
+        if (typeof toast === "function") toast("Reset session preferences to default ↺");
+        renderChatPreferenceRibbon();
+        updateChatWelcomeMessage();
+      };
+
       function openChat(initialMsg = null) {
         updateChatWelcomeMessage();
+        renderChatPreferenceRibbon();
+        const slideBar = document.querySelector("#cart-added-slideup-bar");
+        if (slideBar) slideBar.classList.remove("show");
         $("#chat-overlay").classList.add("show");
         renderChatMessages();
         if (initialMsg) {
@@ -32,17 +76,97 @@
         }
       }
 
+      window.showMealCartSlideupBar = function(title = null, count = null, price = null) {
+        // Don't re-show if user already dismissed via "View Cart"
+        if (window._cartBarDismissed) return;
+
+        // Always use the pre-existing static element inside .phone
+        const slideBar = document.querySelector("#cart-added-slideup-bar");
+        if (!slideBar) return;
+
+        // Hide persistent slide-up cart bar when AI chat drawer is open
+        const chatOverlay = document.querySelector("#chat-overlay");
+        if (chatOverlay && chatOverlay.classList.contains("show")) {
+          slideBar.classList.remove("show");
+          return;
+        }
+
+        let total = 0;
+        if (typeof cartItemsList !== "undefined") {
+          for (const key in cartItemsList) {
+            const p = cartItemsList[key];
+            total += parseInt(String(p.pr).replace(/[^\d]/g, "")) || 0;
+          }
+        }
+        if (price !== null && price !== undefined) total = price;
+        const itemCount = (count !== null && count !== undefined) ? count : (typeof cart !== "undefined" && cart ? cart.size : 0);
+        if (itemCount <= 0) {
+          slideBar.classList.remove("show");
+          return;
+        }
+
+        const barTitle = title || `🛒 ${itemCount} Meal Ingredient${itemCount > 1 ? 's' : ''} Added!`;
+        slideBar.innerHTML = `
+          <div>
+            <div style="font-weight:900;font-size:12.5px;color:#FFD814;">${barTitle}</div>
+            <div style="font-size:10.5px;color:rgba(255,255,255,0.85);">Total ₹${total} • ⚡ Delivered in 8 mins</div>
+          </div>
+          <button class="cart-added-btn" onclick="openCart()">View Cart ➔</button>
+        `;
+        slideBar.classList.add("show");
+      };
+
+      window.openCart = function() {
+        // Mark dismissed — bar won't reappear unless new items are added
+        window._cartBarDismissed = true;
+
+        $("#chat-overlay").classList.remove("show");
+        const slideBar = document.querySelector("#cart-added-slideup-bar");
+        if (slideBar) slideBar.classList.remove("show");
+
+        const tabLinks = document.querySelectorAll(".tabbar a");
+        if (tabLinks.length > 0) {
+          tabLinks.forEach(a => a.classList.remove("active"));
+          const cartTabLink = tabLinks[tabLinks.length - 1];
+          if (cartTabLink) cartTabLink.classList.add("active");
+        }
+
+        const scrollEl = document.querySelector("#scroll") || window;
+        if (scrollEl.scrollTo) scrollEl.scrollTo({ top: 0, behavior: "smooth" });
+
+        let total = 0;
+        if (typeof cartItemsList !== "undefined") {
+          for (const key in cartItemsList) {
+            const p = cartItemsList[key];
+            total += parseInt(String(p.pr).replace(/[^\d]/g, "")) || 0;
+          }
+        }
+        const count = typeof cart !== "undefined" && cart ? cart.size : 0;
+        if (count > 0) {
+          toast(`🛒 Cart Tab: ${count} item${count > 1 ? 's' : ''} (Total ₹${total}) — Ready for Checkout! ⚡`);
+        } else {
+          toast("🛒 Your Zepto Cart is empty.");
+        }
+      };
+
       function closeChat() {
         $("#chat-overlay").classList.remove("show");
+        if (typeof showMealCartSlideupBar === "function") {
+          showMealCartSlideupBar();
+        }
       }
 
       function renderChatMessages() {
+        renderChatPreferenceRibbon();
         const chatBody = $("#chat-body");
-        chatBody.innerHTML = chatMessages.map(m => `
-    <div class="msg ${m.role}">
-      ${m.content}
-    </div>
-  `).join("");
+        chatBody.innerHTML = chatMessages.map((m, idx) => {
+          const isBotWithCards = m.role === 'bot' && (m.content.includes('display: flex') || m.content.includes('has-cards') || m.content.includes('Ingredients'));
+          return `
+            <div class="msg ${m.role} ${isBotWithCards ? 'has-cards' : ''}">
+              ${m.content}
+            </div>
+          `;
+        }).join("");
 
         // Sync the ADD buttons in the chat message history with current cart state
         chatBody.querySelectorAll("button[data-cat]").forEach(btn => {
@@ -847,9 +971,63 @@
         $("#recipe-modal").classList.remove("show");
       };
 
+      window.rateBotResponse = function(btn, rating) {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.bot-feedback-btn').forEach(b => b.style.opacity = '0.5');
+        btn.style.opacity = '1';
+        btn.style.borderColor = rating === 'up' ? '#16A34A' : '#DC2626';
+        if (typeof toast === "function") {
+          toast(rating === 'up' ? "Thanks for your feedback! 👍" : "Got it! We will improve future responses 👎");
+        }
+      };
+
+      window.copyBotResponse = function(btn) {
+        const msgDiv = btn.closest('.msg.bot');
+        if (msgDiv) {
+          const cleanText = msgDiv.innerText.replace(/Was this helpful\?|👍|👎|📋 Copy/g, '').trim();
+          navigator.clipboard.writeText(cleanText).then(() => {
+            if (typeof toast === "function") toast("Copied AI response to clipboard 📋");
+          });
+        }
+      };
+
+      function getDynamicActionChips(ql) {
+        if (ql.includes("biryani") || ql.includes("misal") || ql.includes("puran") || ql.includes("bread") || ql.includes("recipe") || ql.includes("cook")) {
+          return [
+            { text: "💰 Budget options (< ₹300)", query: "Show budget recipe alternatives under ₹300" },
+            { text: "⚡ Low calorie swap", query: "Show low calorie healthier swap for this meal" },
+            { text: "🌶️ Extra spicy pairing", query: "What condiments/spices pair well for extra spice?" }
+          ];
+        } else if (ql.includes("cafe") || ql.includes("coffee") || ql.includes("cold brew")) {
+          return [
+            { text: "🥐 Bakery pairings", query: "What bakery items pair best with cold brew coffee?" },
+            { text: "🥤 Dairy-free milk options", query: "Show me almond milk and oat milk coffee options" },
+            { text: "⚡ High protein breakfast", query: "Recommend high protein cafe breakfast items" }
+          ];
+        }
+        return [
+          { text: "💰 Compare top brands", query: "Compare prices across top brands for these items" },
+          { text: "🥗 Show organic options", query: "Filter recommendations for organic & healthy items" },
+          { text: "📦 Show family bulk packs", query: "Show larger value pack options for 4 people" }
+        ];
+      }
+
       function finishBotResponse(explanation, recos, text) {
-        let botContent = explanation;
         const ql = text.toLowerCase();
+
+        // 1. Collapsible AI Reasoning Accordion
+        let reasoningHtml = `
+          <details class="reasoning-accordion">
+            <summary>🧠 <b>AI Reasoning & Darkstore Inventory Check</b> (0.34s)</summary>
+            <div style="margin-top:6px; font-size:10px; line-height:1.45; color:#475569;">
+              • Searched Zepto Catalog for: <b>"${text}"</b><br>
+              • Validated 8-min express delivery stock at Darkstore #402<br>
+              • Applied session filters: 🟢 <b>${userSessionPreferences.diet}</b> | 💰 <b>${userSessionPreferences.budget} limit</b>
+            </div>
+          </details>
+        `;
+
+        let botContent = reasoningHtml + explanation;
         const suggestedCats = getQueryCategories(ql);
         const stripLabel = getStripLabel(ql);
 
@@ -885,7 +1063,7 @@
       </div>
     `;
           });
-          botContent += `</div>`;
+          botContent += `</div></div>`;
         } else if (isMisalQuery) {
           botContent += `
     <div style="margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px;">
@@ -912,7 +1090,7 @@
       </div>
     `;
           });
-          botContent += `</div>`;
+          botContent += `</div></div>`;
         } else if (isPuranPoliQuery) {
           botContent += `
     <div style="margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px;">
@@ -939,7 +1117,7 @@
       </div>
     `;
           });
-          botContent += `</div>`;
+          botContent += `</div></div>`;
         } else if (isBreadQuery) {
           botContent += `
     <div style="margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px;">
@@ -966,7 +1144,7 @@
       </div>
     `;
           });
-          botContent += `</div>`;
+          botContent += `</div></div>`;
         } else if (isCafeQuery) {
           botContent += `
     <div style="margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px;">
@@ -990,7 +1168,7 @@
       </div>
     `;
           });
-          botContent += `</div>`;
+          botContent += `</div></div>`;
         } else {
           botContent += `
     <div style="margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px;">
@@ -1036,7 +1214,7 @@
     `;
           });
 
-          botContent += `</div>`;
+          botContent += `</div></div>`;
         }
 
         // RENDER HORIZONTAL RECIPE CAROUSEL FOR ALL TOPICS
@@ -1098,14 +1276,6 @@
         <button onclick="addReplacedMealComboToCart(this)" style="width:100%; background:linear-gradient(135deg,#16A34A,#15803D); color:#fff; border:none; font-size:11px; font-weight:900; padding:8px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.25);">
           🛒 Add Replaced Ingredients (Chicken/Mushrooms, Atta, Moong Dal, Tomatoes, Onions, Ghee)
         </button>
-        <div style="display:flex; gap:6px;">
-          <button onclick="sendChatMessage('Plan a dinner for 4 people under ₹600')" style="flex:1; background:#FFFBEB; border:1px solid #FCD34D; color:#B45309; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
-            🧀 Swap back to Paneer
-          </button>
-          <button onclick="sendChatMessage('Change cuisine for meal plan')" style="flex:1; background:#FBF0FF; border:1px solid #E9D5FF; color:#7E22CE; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
-            🍲 Change Cuisine
-          </button>
-        </div>
       </div>
     `;
         } else if (ql.includes("cuisine") || botContent.includes("Select Your Preferred Cuisine")) {
@@ -1127,22 +1297,6 @@
         </div>
       </div>
     `;
-        } else if (ql.includes("meal") || ql.includes("dinner") || ql.includes("lunch") || ql.includes("ingredient") || botContent.includes("With options to:")) {
-          botContent += `
-      <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">
-        <button onclick="addMealPlanComboToCart(this)" style="width:100%; background:linear-gradient(135deg,#16A34A,#15803D); color:#fff; border:none; font-size:11px; font-weight:900; padding:8px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(22,163,74,0.25);">
-          🛒 Add All (Paneer, Tomatoes, Onions, Rice, Curd, Spices)
-        </button>
-        <div style="display:flex; gap:6px;">
-          <button onclick="sendChatMessage('Replace items in meal plan')" style="flex:1; background:#FFFBEB; border:1px solid #FCD34D; color:#B45309; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
-            🔄 Replace Items
-          </button>
-          <button onclick="sendChatMessage('Change cuisine for meal plan')" style="flex:1; background:#FBF0FF; border:1px solid #E9D5FF; color:#7E22CE; font-size:10px; font-weight:900; padding:6px; border-radius:8px; cursor:pointer;">
-            🍲 Change Cuisine
-          </button>
-        </div>
-      </div>
-    `;
         }
 
         botContent += `
@@ -1153,8 +1307,29 @@
           </button>
         `).join("")}
       </div>
-    </div>
-  `;
+    `;
+
+        // Dynamic Action Chips Row
+        const actionChips = getDynamicActionChips(ql);
+        botContent += `
+      <div class="dynamic-chips-row">
+        ${actionChips.map(c => `
+          <button class="dynamic-action-chip" onclick="sendChatMessage('${c.query.replace(/'/g, "\\'")}')">
+            ${c.text}
+          </button>
+        `).join("")}
+      </div>
+    `;
+
+        // Micro-Feedback Rating Bar
+        botContent += `
+      <div class="bot-feedback-bar">
+        <span>Was this response helpful?</span>
+        <button class="bot-feedback-btn" onclick="rateBotResponse(this, 'up')" title="Helpful">👍</button>
+        <button class="bot-feedback-btn" onclick="rateBotResponse(this, 'down')" title="Not helpful">👎</button>
+        <button class="bot-feedback-btn" onclick="copyBotResponse(this)" title="Copy response">📋 Copy</button>
+      </div>
+    `;
 
         chatMessages.push({ role: "bot", content: botContent });
         renderChatMessages();

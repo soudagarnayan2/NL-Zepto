@@ -937,6 +937,7 @@
         });
       }
 
+      let _prevCartSize = 0;
       function updateCartTotal() {
         if (cart.size > 0) {
           let total = 0;
@@ -951,8 +952,21 @@
           $("#cart-item-count").textContent = `${cart.size} item${cart.size > 1 ? 's' : ''} · ${newCats.size} new category`;
           $("#cart-total-price").textContent = `₹${total}`;
           $("#cart-bar").classList.add("show");
+
+          // Only reset dismissed if cart was previously empty (brand new cart session)
+          if (_prevCartSize === 0) {
+            window._cartBarDismissed = false;
+          }
+          _prevCartSize = cart.size;
+          if (typeof showMealCartSlideupBar === "function") {
+            showMealCartSlideupBar(null, cart.size, total);
+          }
         } else {
           $("#cart-bar").classList.remove("show");
+          const slideBar = document.querySelector("#cart-added-slideup-bar");
+          if (slideBar) slideBar.classList.remove("show");
+          window._cartBarDismissed = false;
+          _prevCartSize = 0;
         }
       }
 

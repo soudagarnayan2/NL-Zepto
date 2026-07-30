@@ -13,6 +13,19 @@ from typing import Optional, Dict, Any
 
 from app.session_store import session_store
 from app.orchestrator import run_agent_loop
+from app.zepto_client import ZeptoAPI
+from app.qa_pipeline import process_qa_user_request
+from app.intent_router import classify_intent, classify_intent_json_str
+from app.quality_validator import validate_quality
+import re
+
+zepto_api = ZeptoAPI()
+
+
+def generate_smart_response(query: str) -> str:
+    """Delegates to process_qa_user_request implementing Approach 2 & 3 from Zepto_AI_QA.json."""
+    return process_qa_user_request(query)
+
 
 app = FastAPI(title="Ask Zepto AI API", version="1.0.0")
 
@@ -37,6 +50,32 @@ app.add_middleware(
 def health_check():
     """GET /health — liveness probe. Returns 200 OK when the server is running."""
     return JSONResponse(status_code=200, content={"status": "ok"})
+
+
+class IntentRouteRequest(BaseModel):
+    query: Optional[str] = None
+    user_prompt: Optional[str] = None
+
+
+@app.post("/intent")
+def intent_router_endpoint(request: IntentRouteRequest):
+    """Zepto AI's Intent Router endpoint — returns ONLY classification JSON."""
+    user_text = request.query or request.user_prompt or ""
+    return JSONResponse(status_code=200, content=classify_intent(user_text))
+
+
+class ValidateRequest(BaseModel):
+    user_prompt: str
+    assistant_response: str
+
+
+@app.post("/validate")
+def quality_validator_endpoint(request: ValidateRequest):
+    """Zepto AI Quality Validator endpoint — returns PASS/FAIL + evaluations + explanation."""
+    return JSONResponse(
+        status_code=200,
+        content=validate_quality(request.user_prompt, request.assistant_response)
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -138,11 +177,17 @@ def chat_endpoint(request: ChatRequest) -> ChatResponse:
     history.append({"role": "user", "content": request.message})
 
     # 3. Call orchestrator with user message and session history
-    final_text, updated_history = run_agent_loop(
-        messages=history,
-        session_context=nudge_context,
-        return_history=True,
-    )
+    try:
+        final_text, updated_history = run_agent_loop(
+            messages=history,
+            session_context=nudge_context,
+            return_history=True,
+        )
+    except Exception as exc:
+        print(f"[chat_endpoint] Agent loop error: {exc}")
+        final_text = generate_smart_response(request.message)
+        history.append({"role": "assistant", "content": final_text})
+        updated_history = history
 
     # 4. Update session store with new history
     session["conversation_history"] = updated_history
@@ -205,58 +250,7 @@ async def zepto_stream(user_id: str = "anonymous", query: str = "",
             )
         except Exception as exc:
             print(f"[zepto_stream] Agent loop error: {exc}")
-            q_lower = query.lower()
-            if "replace" in q_lower or "swap" in q_lower:
-                fallback_text = (
-                    "🔄 Replaced Meal Plan (Dinner for 4 under ₹600)\n\n"
-                    "Substituted Paneer & Basmati Rice with Fresh Mushrooms / Chicken, Wheat Atta & Yellow Moong Dal:\n\n"
-                    "• Fresh Mushrooms / Chicken Cut\n"
-                    "• Whole Wheat Chakki Atta (Fresh Chapatis)\n"
-                    "• Organic Yellow Moong Dal\n"
-                    "• Hybrid Tomatoes & Green Capsicum\n"
-                    "• Fresh Red Onions\n"
-                    "• Pure Cow Ghee & Whole Spices\n\n"
-                    "With options to:\n\n"
-                    "• Add Replaced Ingredients\n"
-                    "• Swap back to Paneer\n"
-                    "• Change Cuisine"
-                )
-            elif "cuisine" in q_lower:
-                fallback_text = (
-                    "🍲 Select Your Preferred Cuisine (Dinner for 4 under ₹600)\n\n"
-                    "Choose a fresh regional or international dinner option:\n\n"
-                    "• 🇮🇳 North Indian (₹520): Shahi Paneer, Dal Makhani, Whole Wheat Roti, Jeera Rice\n"
-                    "• 🌴 South Indian (₹410): Dosa & Idli Batter, Sambhar Veggies, Coconut & Filter Coffee\n"
-                    "• 🥢 Indo-Chinese (₹380): Hakka Noodles, Chilli Paneer Cubes, Soy & Garlic Sauce\n"
-                    "• 🍝 Italian / Continental (₹460): Penne Pasta, Amul Butter, Garlic Bread & Cheese\n\n"
-                    "With options to:\n\n"
-                    "• Add North Indian\n"
-                    "• Add South Indian\n"
-                    "• Add Indo-Chinese\n"
-                    "• Add Italian"
-                )
-            elif any(k in q_lower for k in ["meal", "dinner", "lunch", "ingredient", "plan"]):
-                fallback_text = (
-                    "Plan a dinner for 4 people under ₹600.\n\n"
-                    "The AI could recommend:\n\n"
-                    "• Paneer\n"
-                    "• Tomatoes\n"
-                    "• Onions\n"
-                    "• Rice\n"
-                    "• Curd\n"
-                    "• Spices\n\n"
-                    "With options to:\n\n"
-                    "• Add All\n"
-                    "• Replace Items\n"
-                    "• Change Cuisine"
-                )
-            elif "biryani" in q_lower or "briyani" in q_lower or "biriyani" in q_lower:
-                fallback_text = (
-                    "🍲 **Authentic Royal Dum Biryani Prep Kit**:\n"
-                    "Cooking homemade Biryani? Get long-grain Basmati Rice, Everest Shahi Biryani Masala, Pure Cow Ghee, Fresh Curd, Ginger-Garlic Paste, Fresh Chicken/Paneer & Mint delivered in 8 mins!"
-                )
-            else:
-                fallback_text = f"Based on your request for '{query}', here are top recommended items live from Zepto's catalog!"
+            fallback_text = generate_smart_response(query)
 
             session["conversation_history"].append({"role": "assistant", "content": fallback_text})
             session_store.save_session(session_id, session)
