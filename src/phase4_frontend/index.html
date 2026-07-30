@@ -4825,12 +4825,15 @@
                 thinkingDiv.remove();
                 streamDiv = document.createElement("div");
                 streamDiv.className = "msg bot";
-                streamDiv.innerHTML = `<span style="font-size:10px;font-weight:900;color:var(--zepto-pink);background:#FBF0FF;padding:2px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:4px;margin-bottom:4px;">⚡ REALTIME ZEPTO STREAM (${data.dark_store} · ${data.eta})</span><br><span class="stext">...</span>`;
+                streamDiv.innerHTML = `<span style="font-size:10px;font-weight:900;color:var(--zepto-pink);background:#FBF0FF;padding:2px 7px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;margin-bottom:6px;border:1px solid #F5D0FE;">⚡ REALTIME ZEPTO STREAMING (${data.dark_store} · ${data.eta})</span><br><div class="stext" style="font-size:13.5px;line-height:1.45;color:var(--ink);">Listening for AI tokens...</div>`;
                 chatBody.appendChild(streamDiv);
                 chatBody.scrollTop = chatBody.scrollHeight;
               } else if (data.type === "text_chunk") {
                 if (streamDiv) {
-                  streamDiv.querySelector(".stext").textContent = data.text;
+                  const textEl = streamDiv.querySelector(".stext");
+                  if (textEl) {
+                    textEl.innerHTML = data.text.replace(/\n/g, "<br>");
+                  }
                   chatBody.scrollTop = chatBody.scrollHeight;
                 }
               } else if (data.type === "complete") {
