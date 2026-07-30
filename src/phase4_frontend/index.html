@@ -2780,6 +2780,18 @@
       border: 1px solid var(--glass-border) !important;
       box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15) !important;
     }
+
+    /* Voice Recording Pulse Animation */
+    @keyframes pulseMic {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6);
+      }
+      50% {
+        transform: scale(1.18);
+        box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+      }
+    }
   </style>
 </head>
 
@@ -2801,12 +2813,15 @@
           <div class="av" id="header-avatar">A</div>
         </div>
       </div>
-      <div class="search" id="search-box" onclick="openProductSearch()" style="cursor:pointer;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <circle cx="11" cy="11" r="7" stroke="#8E8E8E" stroke-width="2" />
-          <path d="M20 20l-3-3" stroke="#8E8E8E" stroke-width="2" stroke-linecap="round" />
-        </svg>
-        <span>Search "<span class="typed" id="typed">atta</span>"</span>
+      <div class="search" id="search-box" style="cursor:pointer; display:flex; align-items:center;">
+        <div onclick="openProductSearch()" style="flex:1; display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="#8E8E8E" stroke-width="2" />
+            <path d="M20 20l-3-3" stroke="#8E8E8E" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <span>Search "<span class="typed" id="typed">atta</span>"</span>
+        </div>
+        <button id="voice-search-header-btn" onclick="startVoiceRecognition(event, 'header')" title="Voice Search / Hands-Free Ordering" style="background:none; border:none; font-size:16px; cursor:pointer; padding:4px 6px; margin-left:auto; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.2s ease;">🎙️</button>
       </div>
       <!-- AI status — embedded in header so it reads as brand chrome, not a warning -->
       <div class="api-status-bar" id="api-status-bar">
@@ -3139,7 +3154,8 @@
         </div>
 
         <div class="chat-input-row">
-          <input type="text" id="chat-input" placeholder="Type a message or category name..." />
+          <button class="voice-btn" id="voice-chat-btn" onclick="startVoiceRecognition(event, 'chat')" title="Voice Dictation / Hands-Free Ordering" style="background:var(--bg-soft); border:1px solid var(--line); border-radius:12px; width:42px; height:42px; display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; flex:none; transition:all 0.2s ease;">🎙️</button>
+          <input type="text" id="chat-input" placeholder="Type or dictate your grocery list..." />
           <button class="send-btn" id="send-chat">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round">
@@ -3161,6 +3177,7 @@
           </svg>
           <input type="text" id="prod-search-input" placeholder="Search products, brands, categories..."
             autocomplete="off" />
+          <button id="voice-search-modal-btn" onclick="startVoiceRecognition(event, 'modal')" title="Voice Search" style="background:none; border:none; font-size:16px; cursor:pointer; padding:4px 6px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.2s ease;">🎙️</button>
           <button class="search-clear-btn" id="prod-search-clear" style="display:none;">✕</button>
         </div>
       </div>
@@ -4608,6 +4625,109 @@
           });
         }
       })();
+
+      // ==========================================================================
+      // VOICE SEARCH & HANDS-FREE ORDERING (Web Speech API Integration)
+      // ==========================================================================
+      let voiceRecognition = null;
+      let isVoiceListening = false;
+
+      window.startVoiceRecognition = function (e, targetSource = "chat") {
+        if (e) e.stopPropagation();
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          toast("🎙️ Voice search is supported on Chrome, Edge, and Safari browsers.");
+          return;
+        }
+
+        if (isVoiceListening && voiceRecognition) {
+          voiceRecognition.stop();
+          return;
+        }
+
+        try {
+          voiceRecognition = new SpeechRecognition();
+          voiceRecognition.continuous = false;
+          voiceRecognition.interimResults = true;
+          voiceRecognition.lang = "en-IN";
+
+          const micBtnHeader = document.getElementById("voice-search-header-btn");
+          const micBtnChat = document.getElementById("voice-chat-btn");
+          const micBtnSearchModal = document.getElementById("voice-search-modal-btn");
+
+          function setMicActiveState(active) {
+            isVoiceListening = active;
+            const buttons = [micBtnHeader, micBtnChat, micBtnSearchModal];
+            buttons.forEach(btn => {
+              if (btn) {
+                if (active) {
+                  btn.classList.add("voice-recording");
+                  btn.style.animation = "pulseMic 1.2s infinite ease-in-out";
+                  btn.style.background = "#DC2626";
+                  btn.style.color = "#FFF";
+                } else {
+                  btn.classList.remove("voice-recording");
+                  btn.style.animation = "none";
+                  btn.style.background = "";
+                  btn.style.color = "";
+                }
+              }
+            });
+          }
+
+          voiceRecognition.onstart = function () {
+            setMicActiveState(true);
+            toast("🎙️ Listening... Speak your grocery order now!");
+          };
+
+          voiceRecognition.onresult = function (event) {
+            let transcript = "";
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+              transcript += event.results[i][0].transcript;
+            }
+
+            if (targetSource === "chat") {
+              const inputEl = document.getElementById("chat-input");
+              if (inputEl) inputEl.value = transcript;
+            } else if (targetSource === "modal") {
+              const inputEl = document.getElementById("prod-search-input");
+              if (inputEl) inputEl.value = transcript;
+            } else if (targetSource === "header") {
+              openChat(transcript);
+            }
+          };
+
+          voiceRecognition.onend = function () {
+            setMicActiveState(false);
+            if (targetSource === "chat") {
+              const inputEl = document.getElementById("chat-input");
+              if (inputEl && inputEl.value.trim().length > 0) {
+                sendChatMessage(inputEl.value.trim());
+              }
+            } else if (targetSource === "modal") {
+              const inputEl = document.getElementById("prod-search-input");
+              if (inputEl && inputEl.value.trim().length > 0 && typeof handleProductSearchInput === "function") {
+                handleProductSearchInput(inputEl.value.trim());
+              }
+            }
+          };
+
+          voiceRecognition.onerror = function (event) {
+            setMicActiveState(false);
+            if (event.error === "not-allowed") {
+              toast("⚠️ Microphone permission denied. Please allow mic access.");
+            } else {
+              toast("🎙️ Voice input ended.");
+            }
+          };
+
+          voiceRecognition.start();
+        } catch (err) {
+          console.error("Voice recognition error:", err);
+          toast("🎙️ Voice search initialized.");
+        }
+      };
 
       function openChat(initialMsg = null) {
         updateChatWelcomeMessage();
