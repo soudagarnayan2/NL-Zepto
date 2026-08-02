@@ -190,10 +190,18 @@
         chatMessages.push({ role: "user", content: text });
         renderChatMessages();
 
+        const chatInput = document.getElementById("chat-input");
+        if (chatInput) chatInput.value = "";
+
         const chatBody = $("#chat-body");
         const thinkingDiv = document.createElement("div");
         thinkingDiv.className = "msg bot thinking";
-        thinkingDiv.innerHTML = "<span></span><span></span><span></span>";
+        thinkingDiv.innerHTML = `
+          <span style="font-size:11px; font-weight:800; color:var(--zepto-purple-2); display:inline-flex; align-items:center; gap:4px;">
+            ⚡ Ask Zepto AI is searching...
+          </span>
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+        `;
         chatBody.appendChild(thinkingDiv);
         chatBody.scrollTop = chatBody.scrollHeight;
 
@@ -209,18 +217,45 @@
             let finalExplanation = "";
             let finalRecos = [];
 
+            let accumulatedTokens = "";
             es.onmessage = (event) => {
               const data = JSON.parse(event.data);
               if (data.type === "telemetry") {
                 thinkingDiv.remove();
                 streamDiv = document.createElement("div");
                 streamDiv.className = "msg bot";
-                streamDiv.innerHTML = `<span style="font-size:10px;font-weight:900;color:var(--zepto-pink);background:#FBF0FF;padding:2px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:4px;margin-bottom:4px;">⚡ REALTIME ZEPTO STREAM (${data.dark_store} · ${data.eta})</span><br><span class="stext">...</span>`;
+                streamDiv.innerHTML = `
+                  <span style="font-size:10px;font-weight:900;color:var(--zepto-pink);background:#FBF0FF;padding:2px 7px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;margin-bottom:6px;border:1px solid #F5D0FE;">
+                    ⚡ REALTIME ZEPTO STREAMING (${data.dark_store} · ${data.eta})
+                  </span><br>
+                  <div class="sstatus" style="font-size:11px;font-weight:800;color:var(--zepto-purple-2);margin-bottom:4px;display:flex;align-items:center;gap:4px;">
+                    🧠 Preparing response...
+                  </div>
+                  <div class="stext" style="font-size:13.5px;line-height:1.45;color:var(--ink);">Listening for AI tokens...</div>
+                `;
                 chatBody.appendChild(streamDiv);
                 chatBody.scrollTop = chatBody.scrollHeight;
+              } else if (data.type === "thinking") {
+                if (streamDiv) {
+                  const statusEl = streamDiv.querySelector(".sstatus");
+                  if (statusEl) statusEl.innerHTML = data.text;
+                }
+              } else if (data.type === "tool_call") {
+                if (streamDiv) {
+                  const statusEl = streamDiv.querySelector(".sstatus");
+                  if (statusEl) statusEl.innerHTML = `⚙️ Executing <b>${data.tool}()</b>...`;
+                }
+              } else if (data.type === "token") {
+                if (streamDiv) {
+                  accumulatedTokens += data.token;
+                  const textEl = streamDiv.querySelector(".stext");
+                  if (textEl) textEl.innerHTML = accumulatedTokens.replace(/\n/g, "<br>");
+                  chatBody.scrollTop = chatBody.scrollHeight;
+                }
               } else if (data.type === "text_chunk") {
                 if (streamDiv) {
-                  streamDiv.querySelector(".stext").textContent = data.text;
+                  const textEl = streamDiv.querySelector(".stext");
+                  if (textEl) textEl.innerHTML = data.text.replace(/\n/g, "<br>");
                   chatBody.scrollTop = chatBody.scrollHeight;
                 }
               } else if (data.type === "complete") {
@@ -1502,16 +1537,16 @@
             `Or tap below to view our ready dinner plan for 4 people under ₹600!`;
         }
 
-        // Grocery Basket Protocol: Collects Family size, Budget, Diet, Preferred brands, Shopping frequency
+        // Grocery Basket Protocol: Generates ONE complete shopping basket containing Vegetables, Fruits, Dairy, Snacks, Cleaning & Personal Care
         if (ql === "groceries" || ql === "buy groceries" || ql === "grocery list" || ql === "restock" || ql === "weekly groceries" || ql.includes("grocery")) {
-          return `🛒 <b>Grocery Shopping & Basket Building Protocol</b>:<br><br>` +
-            `To curate your complete single shopping basket, please tell me:<br>` +
-            `1. <b>Family size</b> (e.g. 4 members)<br>` +
-            `2. <b>Budget limit</b> (e.g. ₹1500)<br>` +
-            `3. <b>Diet</b> (Vegetarian / Non-Veg / Organic)<br>` +
-            `4. <b>Preferred brands</b> (e.g. Amul, Aashirvaad, Surf Excel, or Any)<br>` +
-            `5. <b>Shopping frequency</b> (Weekly / Monthly)<br><br>` +
-            `Once collected, I'll generate your complete shopping basket containing Vegetables, Fruits, Dairy, Snacks, Cleaning & Personal Care with Total Cost & 8-min delivery!`;
+          return `🛒 <b>Complete Weekly Grocery Basket</b> for <b>${area}</b>:<br><br>` +
+            `Here is your complete curated shopping basket containing fresh essentials across all major categories:<br><br>` +
+            `• 🌾 <b>Staples & Atta</b>: Aashirvaad Shuddh Chakki Atta (5kg) & Fortune Everyday Rice (1kg)<br>` +
+            `• 🥦 <b>Vegetables & Fruits</b>: Hybrid Tomatoes (1kg), Red Onions (1kg) & Fresh Bananas<br>` +
+            `• 🥛 <b>Dairy & Eggs</b>: Amul Fresh Milk (500ml), Butter (100g) & Brown Eggs (6 pcs)<br>` +
+            `• 🍿 <b>Snacks & Munchies</b>: Britannia Whole Wheat Bread & Kurkure Masala Munch<br>` +
+            `• 🧹 <b>Cleaning & Household</b>: Vim Dishwash Gel & Kitchen Tissues<br><br>` +
+            `📊 <b>Basket Total</b>: <b>₹584</b> • ⚡ Delivered in <b>8 mins</b> to <b>${area}</b>`;
         }
 
         // Cart Optimization Protocol: Analyzes cart, offers, combo discounts, cheaper alternatives, frequently bought together
@@ -1560,32 +1595,31 @@
             `With options to:`;
         }
 
-        // Ingredient-Based Recipe Protocol: Generates recipe using given ingredients, identifies missing ingredients, cooking steps, YouTube link
+        // Ingredient-Based Recipe Protocol: Generates recipe using given ingredients, identifies missing ingredients, cooking steps
         if (ql.includes("i have") || ql.includes("ingredients:") || ql.includes("using ingredients") || ql.includes("with ingredients")) {
+          const itemMatch = ql.includes("egg") ? "Egg Bhurji & Toast" : ql.includes("misal") ? "Puneri Misal Pav" : ql.includes("biryani") ? "Hyderabadi Dum Biryani" : "Custom Prep Kit";
           return `🍳 <b>Custom Recipe from Your Ingredients</b>:<br><br>` +
-            `<b>Shahi Paneer & Jeera Rice Delight</b> (Prep time: 20 mins)<br><br>` +
+            `<b>${itemMatch}</b> (Prep time: 15-20 mins)<br><br>` +
             `<b>Cooking Instructions:</b><br>` +
-            `1. Sauté onions & tomatoes in Ghee until golden brown.<br>` +
-            `2. Blend into smooth gravy, add paneer cubes & spices.<br>` +
-            `3. Temper Basmati rice with cumin seeds & serve hot.<br><br>` +
+            `1. Clean and chop onions, tomatoes & green chillies.<br>` +
+            `2. Heat 2 tbsp Ghee/Oil in a pan, sauté onions and ginger till golden.<br>` +
+            `3. Toss in your ingredients, cook for 8-10 mins on medium heat and serve hot!<br><br>` +
             `🛒 <b>Missing Ingredients (In stock on Zepto):</b><br>` +
-            `• Amul Cow Ghee Jar (200ml) — ₹145<br>` +
-            `• Everest Shahi Paneer Masala (50g) — ₹48<br><br>` +
-            `▶️ <b>Watch Video Tutorial</b>: <a href="https://www.youtube.com/results?search_query=Shahi+Paneer+Jeera+Rice+Recipe" target="_blank" style="color:var(--zepto-purple-2);font-weight:800;text-decoration:underline;">YouTube Recipe Video Guide 🎥</a><br><br>` +
-            `With options to:`;
+            `• Amul Pure Cow Ghee Jar (200ml) — ₹145<br>` +
+            `• Everest Spices & Seasoning Pack — ₹45<br><br>` +
+            `▶️ <b>Watch Video Tutorial</b>: <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(query)}+Recipe" target="_blank" style="color:var(--zepto-purple-2);font-weight:800;text-decoration:underline;">YouTube Recipe Video Guide 🎥</a>`;
         }
 
         // 0R. Replace Items in Meal Plan
         if (ql.includes("replace") || ql.includes("swap")) {
           return `🔄 <b>Replaced Meal Plan (Dinner for 4 under ₹600)</b><br><br>` +
-            `Substituted Paneer & Basmati Rice with Fresh Mushrooms / Chicken, Wheat Atta & Yellow Moong Dal:<br><br>` +
-            `• Fresh Mushrooms / Chicken Cut<br>` +
+            `Substituted main ingredients with Wheat Atta, Fresh Veggies & Toor Dal:<br><br>` +
+            `• Fresh Mushrooms / Paneer Cut<br>` +
             `• Whole Wheat Chakki Atta (Fresh Chapatis)<br>` +
-            `• Organic Yellow Moong Dal<br>` +
+            `• Tata Sampann Unpolished Toor Dal<br>` +
             `• Hybrid Tomatoes & Green Capsicum<br>` +
             `• Fresh Red Onions<br>` +
-            `• Pure Cow Ghee & Whole Spices<br><br>` +
-            `With options to:`;
+            `• Pure Cow Ghee & Whole Spices`;
         }
 
         // 0C. Change Cuisine for Meal Plan
@@ -1595,21 +1629,25 @@
             `• <b>🇮🇳 North Indian (₹520)</b>: Shahi Paneer, Dal Makhani, Whole Wheat Roti, Jeera Rice<br>` +
             `• <b>🌴 South Indian (₹410)</b>: Dosa & Idli Batter, Sambhar Veggies, Coconut & Filter Coffee<br>` +
             `• <b>🥢 Indo-Chinese (₹380)</b>: Hakka Noodles, Chilli Paneer Cubes, Soy & Garlic Sauce<br>` +
-            `• <b>🍝 Italian / Continental (₹460)</b>: Penne Pasta, Amul Butter, Garlic Bread & Cheese<br><br>` +
-            `With options to:`;
+            `• <b>🍝 Italian / Continental (₹460)</b>: Penne Pasta, Amul Butter, Garlic Bread & Cheese`;
         }
 
         // 0M. Complete Meal Generation & Dinner Planning
         if (ql.includes("meal") || ql.includes("dinner") || ql.includes("lunch") || ql.includes("ingredient") || ql.includes("plan")) {
-          return `<b>Plan a dinner for 4 people under ₹600.</b><br><br>` +
-            `The AI could recommend:<br><br>` +
-            `• Paneer<br>` +
-            `• Tomatoes<br>` +
-            `• Onions<br>` +
-            `• Rice<br>` +
-            `• Curd<br>` +
-            `• Spices<br><br>` +
-            `With options to:`;
+          let mealName = "Authentic Dinner Plan";
+          if (ql.includes("biryani")) mealName = "Hyderabadi Dum Biryani Feast";
+          else if (ql.includes("misal")) mealName = "Puneri Spicy Misal Pav";
+          else if (ql.includes("dosa") || ql.includes("south")) mealName = "South Indian Crispy Dosa & Sambhar";
+          else if (ql.includes("pasta") || ql.includes("italian")) mealName = "Italian Creamy Penne Pasta";
+          else if (ql.includes("chinese") || ql.includes("noodle")) mealName = "Indo-Chinese Veg Hakka Noodles";
+
+          return `<b>${mealName} (Serves 4 under ₹600)</b><br><br>` +
+            `Here is your complete curated ingredient kit for <b>${area}</b>:<br><br>` +
+            `• Primary Protein & Veggie Base<br>` +
+            `• Fresh Tomatoes & Red Onions<br>` +
+            `• Staples (Basmati Rice / Wheat Atta / Pav Buns)<br>` +
+            `• Pure Cow Ghee & Whole Spices<br><br>` +
+            `⚡ Delivered in <b>8 mins</b> to <b>${area}</b>`;
         }
 
         // 0D. Dietary & Health Bundles

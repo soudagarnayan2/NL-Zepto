@@ -20,28 +20,39 @@ RESTRICTED_KEYWORDS = [
 
 
 def is_product_valid(product: Dict[str, Any], query: str, budget: Optional[int] = None) -> bool:
-    """Evaluates a single product against the 5 pre-recommendation criteria."""
+    """Evaluates a single product against pre-recommendation criteria."""
     q_lower = query.lower()
     title = product.get("title", "").lower()
     category = product.get("category", "").lower()
+    tags = [t.lower() for t in product.get("tags", [])]
+    all_text = f"{title} {category} {' '.join(tags)}"
 
-    # Rule 1: Reject unrelated products (Chocolate, Ice Cream, Protein Bars, Cold Drinks)
-    # UNLESS specifically requested in query
+    # Rule 1: Reject restricted products (Chocolates, Ice Creams, Protein Bars, Soda) unless requested
     for keyword in RESTRICTED_KEYWORDS:
         if keyword in title or keyword in category:
-            # Check if user query explicitly asked for this keyword
             if keyword not in q_lower:
-                # Also check if root category matched (e.g. "dark chocolate" asked)
-                if not any(req in q_lower for req in ["chocolate", "sweet", "dessert", "bar", "drink", "beverage"]):
+                if not any(req in q_lower for req in ["chocolate", "sweet", "dessert", "bar", "drink", "beverage", "snack"]):
                     return False
 
-    # Rule 2: Availability check
+    # Rule 2: Strict health & protein filtering
+    if any(h in q_lower for h in ["protein", "weight loss", "keto", "sugar free", "diabetic"]):
+        # Check if product is relevant to health/protein
+        health_tags = ["protein", "healthy", "weight loss", "sugar free", "keto", "organic", "wellness", "oats", "peanut butter"]
+        if not any(ht in all_text for ht in health_tags):
+            return False
+
+    # Rule 3: Organic query filtering
+    if "organic" in q_lower:
+        if "organic" not in all_text:
+            return False
+
+    # Rule 4: Availability check
     in_stock = product.get("in_stock", True)
     stock_qty = product.get("stock", 10)
     if not in_stock or stock_qty <= 0:
         return False
 
-    # Rule 3: Budget check
+    # Rule 5: Budget check
     if budget is not None:
         price = product.get("price", 0)
         if price > budget:

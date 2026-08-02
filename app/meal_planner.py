@@ -36,17 +36,69 @@ MEAL_DATABASE: List[Dict[str, Any]] = [
             "Pure Cow Ghee & Whole Spices (100g)"
         ],
         "basket": [
-            {"title": "Milky Mist Fresh Paneer", "quantity": "200 g", "price": 125},
-            {"title": "Fresh Hybrid Tomatoes", "quantity": "500 g", "price": 32},
-            {"title": "Fresh Red Onions", "quantity": "1 kg", "price": 45},
-            {"title": "Daawat Rozana Super Basmati Rice", "quantity": "1 kg", "price": 149},
-            {"title": "Amul Pure Cow Ghee", "quantity": "100 g", "price": 75},
-            {"title": "Everest Shahi Paneer Masala", "quantity": "50 g", "price": 94}
+            {"title": "Amul Fresh Malai Paneer", "quantity": "200 g", "price": 95},
+            {"title": "Farm Fresh Hybrid Tomatoes", "quantity": "1 kg", "price": 38},
+            {"title": "Fresho Fresh Red Onions", "quantity": "1 kg", "price": 32},
+            {"title": "Fortune Everyday Long Grain Basmati Rice", "quantity": "1 kg", "price": 149},
+            {"title": "Amul Pure Cow Ghee Jar", "quantity": "200 ml", "price": 145},
+            {"title": "Everest Shahi Biryani Masala", "quantity": "50 g", "price": 45}
         ],
         "alternatives": [
-            "🍄 Fresh Mushroom Kadhai & Whole Wheat Chapati Meal (Serves 4 | ₹480)",
+            "🍲 Hyderabadi Dum Biryani Feast (Serves 4 | ₹550)",
             "🌴 South Indian Crispy Dosa & Sambhar Fest (Serves 4 | ₹410)",
             "🍝 Italian Creamy Penne & Garlic Toast Meal (Serves 4 | ₹460)"
+        ]
+    },
+    {
+        "id": "m_biryani",
+        "meal_name": "🍲 Royal Hyderabadi Dum Biryani Feast",
+        "cuisine": "North Indian",
+        "serves": 4,
+        "base_cost": 550,
+        "ingredients": [
+            "Basmati Rice Long Grain (1kg)",
+            "Fresh Paneer / Chicken (400g)",
+            "Mother Dairy Fresh Curd (400g)",
+            "Fresho Red Onions & Pure Cow Ghee (200g)",
+            "Everest Biryani Masala & Mint"
+        ],
+        "basket": [
+            {"title": "Fortune Everyday Long Grain Basmati Rice", "quantity": "1 kg", "price": 149},
+            {"title": "Amul Fresh Malai Paneer", "quantity": "200 g", "price": 95},
+            {"title": "Mother Dairy Fresh Curd", "quantity": "400 g", "price": 52},
+            {"title": "Fresho Fresh Red Onions", "quantity": "1 kg", "price": 32},
+            {"title": "Amul Pure Cow Ghee Jar", "quantity": "200 ml", "price": 145},
+            {"title": "Everest Shahi Biryani Masala", "quantity": "50 g", "price": 45}
+        ],
+        "alternatives": [
+            "🍲 Authentic Shahi Paneer & Jeera Rice Dinner (Serves 4 | ₹520)",
+            "🌶️ Puneri Spicy Misal Pav Feast (Serves 4 | ₹280)",
+            "🌴 South Indian Crispy Dosa & Sambhar Fest (Serves 4 | ₹410)"
+        ]
+    },
+    {
+        "id": "m_misal",
+        "meal_name": "🌶️ Puneri Spicy Misal Pav Feast",
+        "cuisine": "Maharashtrian",
+        "serves": 4,
+        "base_cost": 280,
+        "ingredients": [
+            "Sprouted Matki / Moth Beans (250g)",
+            "Puneri Spicy Misal Farsan Mix (200g)",
+            "Fresh Ladi Pav Buns (6 pcs)",
+            "Red Onions & Lemons (500g)"
+        ],
+        "basket": [
+            {"title": "Fresh Soft Ladi Pav Buns", "quantity": "Pack of 6", "price": 25},
+            {"title": "Puneri Spicy Misal Farsan Mix", "quantity": "200 g", "price": 55},
+            {"title": "Fresh Sprouted Matki", "quantity": "250 g", "price": 40},
+            {"title": "Fresho Fresh Red Onions", "quantity": "500 g", "price": 18},
+            {"title": "Amul Pasteurised Butter", "quantity": "100 g", "price": 56}
+        ],
+        "alternatives": [
+            "🫓 Sweet Wheat Puran Poli & Katachi Amti (Serves 4 | ₹340)",
+            "🌧️ Monsoon Evening Tea & Snacks Combo (Serves 4 | ₹260)",
+            "🥪 Veg Cheese & Paneer Grilled Sandwich (Serves 4 | ₹310)"
         ]
     },
     {
@@ -62,11 +114,10 @@ MEAL_DATABASE: List[Dict[str, Any]] = [
             "Fresh Coconut & Mustard Tempering (100g)"
         ],
         "basket": [
-            {"title": "iD Fresh Dosa & Idli Batter", "quantity": "1 kg", "price": 99},
-            {"title": "Fresh Sambhar Veggie Mix", "quantity": "500 g", "price": 65},
-            {"title": "Tata Sampann Unpolished Toor Dal", "quantity": "500 g", "price": 110},
-            {"title": "MTR Sambhar Powder", "quantity": "100 g", "price": 55},
-            {"title": "Fresh Grated Coconut", "quantity": "100 g", "price": 45}
+            {"title": "Fresh Dosa & Idli Batter", "quantity": "1 kg", "price": 99},
+            {"title": "Farm Fresh Hybrid Tomatoes", "quantity": "1 kg", "price": 38},
+            {"title": "Tata Sampann Unpolished Toor Dal", "quantity": "500 g", "price": 85},
+            {"title": "Fresh Red Onions", "quantity": "500 g", "price": 18}
         ],
         "alternatives": [
             "🍲 Authentic Shahi Paneer & Jeera Rice Dinner (Serves 4 | ₹520)",
@@ -88,10 +139,8 @@ MEAL_DATABASE: List[Dict[str, Any]] = [
         ],
         "basket": [
             {"title": "Ching's Secret Hakka Noodles", "quantity": "600 g", "price": 95},
-            {"title": "Fresh Chinese Veggie Stir Fry Mix", "quantity": "500 g", "price": 75},
-            {"title": "Ching's Secret Dark Soy & Green Chilli Sauce", "quantity": "180 g", "price": 60},
-            {"title": "Fortune Sunlite Refined Sunflower Oil", "quantity": "500 ml", "price": 85},
-            {"title": "Fresh Garlic & Green Chillies", "quantity": "100 g", "price": 35}
+            {"title": "Fresho Crisp Green Capsicum", "quantity": "250 g", "price": 35},
+            {"title": "Fortune Sunlite Refined Sunflower Oil", "quantity": "1 L", "price": 135}
         ],
         "alternatives": [
             "🍲 Authentic Shahi Paneer & Jeera Rice Dinner (Serves 4 | ₹520)",
@@ -113,14 +162,12 @@ MEAL_DATABASE: List[Dict[str, Any]] = [
         ],
         "basket": [
             {"title": "Disano Durum Wheat Penne Pasta", "quantity": "500 g", "price": 115},
-            {"title": "Chef's Basket Pasta Red Sauce", "quantity": "300 g", "price": 120},
-            {"title": "Amul Salted Butter", "quantity": "100 g", "price": 58},
-            {"title": "Amul Processed Cheese Block", "quantity": "200 g", "price": 132},
-            {"title": "Fresh Garlic & Parsley", "quantity": "100 g", "price": 35}
+            {"title": "Amul Pasteurised Butter", "quantity": "100 g", "price": 56},
+            {"title": "Amul Processed Cheese Slices", "quantity": "200 g", "price": 125},
+            {"title": "Farm Fresh Hybrid Tomatoes", "quantity": "1 kg", "price": 38}
         ],
         "alternatives": [
             "🍲 Authentic Shahi Paneer & Jeera Rice Dinner (Serves 4 | ₹520)",
-            "🍄 Fresh Mushroom Kadhai & Whole Wheat Chapati Meal (Serves 4 | ₹480)",
             "🌴 South Indian Crispy Dosa & Sambhar Fest (Serves 4 | ₹410)"
         ]
     }
@@ -149,14 +196,21 @@ def plan_meal(query: str, entities: Optional[Dict[str, Any]] = None) -> str:
         except ValueError:
             pass
 
-    # Select suitable meal from database matching cuisine or default
-    selected_meal = MEAL_DATABASE[0]
-    if "south" in q_lower or "dosa" in q_lower:
-        selected_meal = MEAL_DATABASE[1]
-    elif "chinese" in q_lower or "noodle" in q_lower:
-        selected_meal = MEAL_DATABASE[2]
-    elif "pasta" in q_lower or "italian" in q_lower:
-        selected_meal = MEAL_DATABASE[3]
+    # Select suitable meal from database matching query intent
+    selected_meal = None
+    if any(k in q_lower for k in ["biryani", "briyani", "biriyani"]):
+        selected_meal = next((m for m in MEAL_DATABASE if m["id"] == "m_biryani"), None)
+    elif any(k in q_lower for k in ["misal", "puneri"]):
+        selected_meal = next((m for m in MEAL_DATABASE if m["id"] == "m_misal"), None)
+    elif any(k in q_lower for k in ["south", "dosa", "idli"]):
+        selected_meal = next((m for m in MEAL_DATABASE if m["id"] == "m_dosa"), None)
+    elif any(k in q_lower for k in ["chinese", "noodle"]):
+        selected_meal = next((m for m in MEAL_DATABASE if m["id"] == "m_chinese"), None)
+    elif any(k in q_lower for k in ["pasta", "italian"]):
+        selected_meal = next((m for m in MEAL_DATABASE if m["id"] == "m_pasta"), None)
+
+    if selected_meal is None:
+        selected_meal = MEAL_DATABASE[0]
 
     # Run Automatic Budget Enforcement Engine to guarantee total <= budget
     raw_basket = selected_meal["basket"]

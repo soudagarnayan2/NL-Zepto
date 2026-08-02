@@ -2,218 +2,9 @@ import os
 import re
 import requests
 from typing import Optional, Dict, Any, List
+from app.zepto_catalog_500 import ZEPTO_500_CATALOG
 
-LOCAL_ZEPTO_CATALOG: List[Dict[str, Any]] = [
-    # Dairy & Milk (Organic & Regular)
-    {
-        "id": "m1",
-        "title": "Country Delight Organic Cow Milk (Pasteurised)",
-        "category": "Dairy, Bread & Eggs",
-        "price": 42,
-        "mrp": 45,
-        "rating": 4.9,
-        "quantity": "500 ml",
-        "tags": ["milk", "organic milk", "cow milk", "country delight", "organic", "dairy"],
-    },
-    {
-        "id": "m2",
-        "title": "Epigamia Artisanal Organic Whole Milk",
-        "category": "Dairy, Bread & Eggs",
-        "price": 65,
-        "mrp": 70,
-        "rating": 4.8,
-        "quantity": "1 L",
-        "tags": ["milk", "organic milk", "epigamia", "organic", "whole milk", "dairy"],
-    },
-    {
-        "id": "m3",
-        "title": "Amul Taaza T-Special Homogenised Toned Milk",
-        "category": "Dairy, Bread & Eggs",
-        "price": 28,
-        "mrp": 30,
-        "rating": 4.8,
-        "quantity": "500 ml",
-        "tags": ["milk", "toned milk", "amul", "taaza", "dairy"],
-    },
-    {
-        "id": "m4",
-        "title": "Mother Dairy Full Cream Fresh Milk",
-        "category": "Dairy, Bread & Eggs",
-        "price": 34,
-        "mrp": 35,
-        "rating": 4.7,
-        "quantity": "500 ml",
-        "tags": ["milk", "full cream milk", "mother dairy", "dairy"],
-    },
-    {
-        "id": "m5",
-        "title": "Raw Pressery Organic Almond Milk (Unsweetened)",
-        "category": "Dairy & Plant Milk",
-        "price": 180,
-        "mrp": 210,
-        "rating": 4.6,
-        "quantity": "1 L",
-        "tags": ["milk", "almond milk", "plant milk", "vegan", "organic milk", "organic"],
-    },
-
-    # Fruits & Strawberries
-    {
-        "id": "f1",
-        "title": "Mahabaleshwar Fresh Sweet Strawberries",
-        "category": "Fruits & Vegetables",
-        "price": 89,
-        "mrp": 120,
-        "rating": 4.8,
-        "quantity": "200 g pack",
-        "tags": ["strawberries", "strawberry", "fresh strawberries", "fruits", "berries"],
-    },
-    {
-        "id": "f2",
-        "title": "Organic Hydroponic Sweet Strawberries",
-        "category": "Fruits & Vegetables",
-        "price": 129,
-        "mrp": 150,
-        "rating": 4.9,
-        "quantity": "250 g box",
-        "tags": ["strawberries", "organic strawberries", "strawberry", "organic", "fruits"],
-    },
-    {
-        "id": "f3",
-        "title": "Fresh Kashmiri Red Royal Apples",
-        "category": "Fruits & Vegetables",
-        "price": 149,
-        "mrp": 180,
-        "rating": 4.7,
-        "quantity": "4 pcs (approx 500g)",
-        "tags": ["apple", "apples", "fruits", "fresh fruits"],
-    },
-    {
-        "id": "f4",
-        "title": "Fresh Robusta Bananas (Sweet & Ripe)",
-        "category": "Fruits & Vegetables",
-        "price": 38,
-        "mrp": 45,
-        "rating": 4.8,
-        "quantity": "1 kg (approx 6 pcs)",
-        "tags": ["banana", "bananas", "fruits"],
-    },
-    {
-        "id": "f5",
-        "title": "Fresh Imported Blueberries Box",
-        "category": "Fruits & Vegetables",
-        "price": 199,
-        "mrp": 250,
-        "rating": 4.7,
-        "quantity": "125 g pack",
-        "tags": ["blueberries", "berries", "fruits"],
-    },
-
-    # Dark Chocolates & Chocolates under 200
-    {
-        "id": "c1",
-        "title": "Amul Dark Chocolate (75% Intense Dark)",
-        "category": "Munchies & Chocolates",
-        "price": 115,
-        "mrp": 130,
-        "rating": 4.8,
-        "quantity": "150 g bar",
-        "tags": ["dark chocolate", "chocolate", "chocolates", "amul", "under 200"],
-    },
-    {
-        "id": "c2",
-        "title": "Cadbury Bournville 70% Dark Chocolate",
-        "category": "Munchies & Chocolates",
-        "price": 105,
-        "mrp": 120,
-        "rating": 4.7,
-        "quantity": "80 g bar",
-        "tags": ["dark chocolate", "chocolate", "chocolates", "bournville", "cadbury", "under 200"],
-    },
-    {
-        "id": "c3",
-        "title": "Lindt Excellence 70% Cocoa Dark Chocolate",
-        "category": "Gourmet Chocolates",
-        "price": 195,
-        "mrp": 225,
-        "rating": 4.9,
-        "quantity": "100 g bar",
-        "tags": ["dark chocolate", "chocolate", "chocolates", "lindt", "gourmet", "under 200"],
-    },
-    {
-        "id": "c4",
-        "title": "Hershey's Special Dark Whole Almonds Chocolate",
-        "category": "Munchies & Chocolates",
-        "price": 140,
-        "mrp": 160,
-        "rating": 4.7,
-        "quantity": "100 g bar",
-        "tags": ["dark chocolate", "chocolate", "chocolates", "hershey", "almond", "under 200"],
-    },
-    {
-        "id": "c5",
-        "title": "Ketofy Vegan Sugar-Free Dark Chocolate (85%)",
-        "category": "Healthy Snacks",
-        "price": 185,
-        "mrp": 210,
-        "rating": 4.6,
-        "quantity": "75 g bar",
-        "tags": ["dark chocolate", "chocolate", "chocolates", "sugar free", "keto", "under 200"],
-    },
-
-    # Protein & Healthy Snacks
-    {
-        "id": "p1",
-        "title": "Pintola All Natural Organic Peanut Butter (Crunchy)",
-        "category": "Protein & Wellness",
-        "price": 299,
-        "mrp": 349,
-        "rating": 4.9,
-        "quantity": "1 kg jar",
-        "tags": ["protein", "peanut butter", "organic", "healthy", "weight loss"],
-    },
-    {
-        "id": "p2",
-        "title": "RiteBite Max Protein Bar (20g Protein - Choco Fudge)",
-        "category": "Protein & Wellness",
-        "price": 110,
-        "mrp": 130,
-        "rating": 4.7,
-        "quantity": "70 g bar",
-        "tags": ["protein", "protein bar", "healthy", "weight loss", "under 200"],
-    },
-    {
-        "id": "p3",
-        "title": "Yogabar High Protein Oats (Dark Chocolate & Nuts)",
-        "category": "Breakfast & Oats",
-        "price": 199,
-        "mrp": 240,
-        "rating": 4.8,
-        "quantity": "400 g pack",
-        "tags": ["protein", "oats", "healthy", "breakfast", "under 200"],
-    },
-
-    # Tea, Coffee & Beverages
-    {
-        "id": "t1",
-        "title": "Tata Tea Gold Premium Assam Tea",
-        "category": "Tea & Coffee",
-        "price": 160,
-        "mrp": 180,
-        "rating": 4.8,
-        "quantity": "500 g pack",
-        "tags": ["tea", "chai", "tata tea", "beverages"],
-    },
-    {
-        "id": "t2",
-        "title": "Nescafe Classic Instant Coffee Jar",
-        "category": "Tea & Coffee",
-        "price": 185,
-        "mrp": 210,
-        "rating": 4.8,
-        "quantity": "100 g jar",
-        "tags": ["coffee", "nescafe", "instant coffee", "beverages"],
-    },
-]
+LOCAL_ZEPTO_CATALOG: List[Dict[str, Any]] = ZEPTO_500_CATALOG
 
 
 class ZeptoAPI:
@@ -267,7 +58,49 @@ class ZeptoAPI:
     def _local_search(self, query: str, limit: int = 10) -> Dict[str, Any]:
         """Perform fuzzy token matching on local catalog dataset."""
         q_clean = query.lower()
+        
+        # Keyword synonym normalization mapping
+        synonyms = {
+            "paneer": ["paneer", "cottage cheese", "malai paneer"],
+            "cheese": ["cheese", "paneer"],
+            "butter": ["butter", "ghee"],
+            "milk": ["milk", "dairy", "taaza"],
+            "curd": ["curd", "dahi", "yogurt"],
+            "atta": ["atta", "wheat flour", "flour"],
+            "rice": ["rice", "basmati"],
+            "dal": ["dal", "dals", "lentils", "pulses", "moong", "toor", "chana"],
+            "oil": ["oil", "ghee"],
+            "ghee": ["ghee", "butter"],
+            "bread": ["bread", "pav", "toast"],
+            "egg": ["egg", "eggs"],
+            "tomato": ["tomato", "tomatoes"],
+            "onion": ["onion", "onions"],
+            "tea": ["tea", "chai"],
+            "coffee": ["coffee", "brew"],
+            "chocolate": ["chocolate", "chocolates", "cocoa"],
+            "protein": ["protein", "whey", "peanut butter", "isolate", "creatine", "bcaa", "gainer"],
+            "whey": ["whey", "protein", "isolate"],
+            "jewellery": ["jewellery", "jewelry", "jhumka", "jhumkas", "earrings", "necklace", "ring", "pendant", "bracelet", "bangle", "choker", "giva", "zaveri"],
+            "jhumka": ["jhumka", "jhumkas", "earrings", "jewellery"],
+            "earrings": ["earrings", "jhumka", "studs", "hoops", "drop earrings", "jewellery"],
+            "necklace": ["necklace", "pendant", "choker", "chain", "jewellery"],
+            "ring": ["ring", "solitaire", "band ring", "jewellery"],
+            "apparel": ["apparel", "clothing", "tshirt", "shirt", "kurti", "hoodie", "pants", "socks", "boxers", "jockey", "levis", "puma"],
+            "tshirt": ["tshirt", "tee", "shirt", "polo", "apparel"],
+            "shirt": ["shirt", "tshirt", "denim shirt", "apparel"],
+            "kurti": ["kurti", "tunic", "ethnic", "apparel"],
+            "healthcare": ["healthcare", "pharmacy", "medicine", "first aid", "dettol", "volini", "moov", "cough", "syrup", "antiseptic", "multivitamin", "vitamin"],
+            "medicine": ["healthcare", "pharmacy", "medicine", "tablets", "syrup"],
+            "electronics": ["electronics", "earbuds", "tws", "charger", "power bank", "smartwatch", "speaker", "boat", "noise"],
+            "earbuds": ["earbuds", "airdopes", "tws", "earphones", "headphones"],
+            "kitchen": ["kitchen", "home", "cooker", "tawa", "flask", "kettle", "casserole", "milton", "prestige"]
+        }
+
         tokens = [t for t in re.findall(r"\w+", q_clean) if len(t) > 1]
+        expanded_tokens = set(tokens)
+        for t in tokens:
+            if t in synonyms:
+                expanded_tokens.update(synonyms[t])
 
         # Extract budget constraints if mentioned (e.g. under 200 / under ₹200)
         budget = None
@@ -287,23 +120,20 @@ class ZeptoAPI:
             score = 0
             item_text = f"{item['title']} {item['category']} {' '.join(item['tags'])}".lower()
 
-            for token in tokens:
+            for token in expanded_tokens:
                 if token in item_text:
-                    score += 2
+                    score += 3
                 for tag in item["tags"]:
-                    if token in tag:
-                        score += 3
+                    if token in tag or tag in token:
+                        score += 4
 
-            if score > 0 or not tokens:
+            if score > 0:
                 matched_results.append((score, item))
 
         # Sort by match score descending, then rating descending
         matched_results.sort(key=lambda x: (x[0], x[1]["rating"]), reverse=True)
 
         items = [x[1] for x in matched_results[:limit]]
-        if not items:
-            # Return top general items if no match
-            items = LOCAL_ZEPTO_CATALOG[:limit]
 
         return {
             "status": "success",

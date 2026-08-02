@@ -205,23 +205,18 @@ def chat_endpoint(request: ChatRequest) -> ChatResponse:
 async def zepto_stream(user_id: str = "anonymous", query: str = "",
                         pincode: str = "", location: str = ""):
     """
-    GET /realtime/zepto-stream — Server-Sent Events endpoint.
+    GET /realtime/zepto-stream — Server-Sent Events endpoint with real-time token streaming.
 
-    The frontend opens an EventSource to this URL when the user sends a chat
-    message. We run the agent loop in a thread-pool executor (to avoid
-    blocking the async event loop), then stream the result back as SSE events:
-
+    Emits SSE events:
         data: {"type": "telemetry", "dark_store": "...", "eta": "..."}
-        data: {"type": "text_chunk", "text": "..."}
-        data: {"type": "complete",   "text": "...", "recommendations": [...]}
-
-    A stable ``session_id`` is derived from ``user_id`` so chat history is
-    preserved across messages from the same user.
+        data: {"type": "thinking",  "text": "..."}
+        data: {"type": "text_chunk","text": "..."}
+        data: {"type": "complete",  "text": "...", "recommendations": [...]}
     """
     session_id = f"frontend_{user_id}"
 
     async def event_generator():
-        # ── telemetry frame — frontend uses this to show dark-store badge ──
+        # 1. Telemetry event — dark store & ETA info
         dark_store = location.split(",")[0].strip() if location else "Zepto Dark Store"
         telemetry = json.dumps({
             "type": "telemetry",
@@ -229,52 +224,84 @@ async def zepto_stream(user_id: str = "anonymous", query: str = "",
             "eta": "8 mins ⚡",
         })
         yield f"data: {telemetry}\n\n"
-        await asyncio.sleep(0)   # yield to event loop
+        await asyncio.sleep(0.05)
 
-        # ── run the agent loop in a thread (sync SDK call) ──────────────────
+        # 2. Thinking event — initial intent & catalog query status
+        thinking_payload = json.dumps({
+            "type": "thinking",
+            "text": "🧠 Classifying intent & querying Zepto catalog..."
+        })
+        yield f"data: {thinking_payload}\n\n"
+        await asyncio.sleep(0.1)
+
         session = session_store.get_or_create_session(session_id)
         history = list(session["conversation_history"])
         nudge_context = session["nudge_context"]
-
         history.append({"role": "user", "content": query})
 
         loop = asyncio.get_event_loop()
-        try:
-            final_text, updated_history = await loop.run_in_executor(
-                None,
-                lambda: run_agent_loop(
-                    messages=history,
-                    session_context=nudge_context,
-                    return_history=True,
-                ),
-            )
-        except Exception as exc:
-            print(f"[zepto_stream] Agent loop error: {exc}")
-            fallback_text = generate_smart_response(query)
 
-            session["conversation_history"].append({"role": "assistant", "content": fallback_text})
-            session_store.save_session(session_id, session)
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        has_real_key = bool(api_key and not api_key.startswith("dummy"))
 
-            complete_payload = json.dumps({
-                "type": "complete",
-                "text": fallback_text,
-                "recommendations": [],
-            })
-            yield f"data: {complete_payload}\n\n"
-            return
+        if has_real_key:
+            try:
+                final_text, updated_history = await loop.run_in_executor(
+                    None,
+                    lambda: run_agent_loop(
+                        messages=history,
+                        session_context=nudge_context,
+                        return_history=True,
+                    ),
+                )
+                session["conversation_history"] = updated_history
+                session_store.save_session(session_id, session)
 
-        # ── persist updated history ──────────────────────────────────────────
-        session["conversation_history"] = updated_history
+                # Stream out tokens smoothly over SSE
+                words = final_text.split(" ")
+                accumulated = ""
+                for i, word in enumerate(words):
+                    accumulated += (word + " " if i < len(words) - 1 else word)
+                    if i % 3 == 0 or i == len(words) - 1:
+                        chunk_payload = json.dumps({"type": "text_chunk", "text": accumulated})
+                        yield f"data: {chunk_payload}\n\n"
+                        await asyncio.sleep(0.03)
+
+                complete_payload = json.dumps({
+                    "type": "complete",
+                    "text": final_text,
+                    "recommendations": [],
+                })
+                yield f"data: {complete_payload}\n\n"
+                return
+            except Exception as exc:
+                print(f"[zepto_stream] Anthropic API error: {exc}")
+
+        # Fallback / Smart Response SSE Streaming pipeline
+        thinking_payload = json.dumps({
+            "type": "thinking",
+            "text": "⚡ Formulating personalized Zepto recommendation..."
+        })
+        yield f"data: {thinking_payload}\n\n"
+        await asyncio.sleep(0.12)
+
+        fallback_text = generate_smart_response(query)
+        session["conversation_history"].append({"role": "assistant", "content": fallback_text})
         session_store.save_session(session_id, session)
 
-        # ── stream a partial text_chunk then the complete frame ──────────────
-        chunk_payload = json.dumps({"type": "text_chunk", "text": final_text})
-        yield f"data: {chunk_payload}\n\n"
-        await asyncio.sleep(0)
+        # Token streaming animation over SSE
+        words = fallback_text.split(" ")
+        accumulated = ""
+        for i, word in enumerate(words):
+            accumulated += (word + " " if i < len(words) - 1 else word)
+            if i % 4 == 0 or i == len(words) - 1:
+                chunk_payload = json.dumps({"type": "text_chunk", "text": accumulated})
+                yield f"data: {chunk_payload}\n\n"
+                await asyncio.sleep(0.03)
 
         complete_payload = json.dumps({
             "type": "complete",
-            "text": final_text,
+            "text": fallback_text,
             "recommendations": [],
         })
         yield f"data: {complete_payload}\n\n"
@@ -284,6 +311,7 @@ async def zepto_stream(user_id: str = "anonymous", query: str = "",
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
         },
     )

@@ -70,13 +70,11 @@ def search_zepto_products(query: str) -> str:
             f"Alternatives: Try searching for similar categories like Dairy, Produce, or Pantry."
         )
 
-    # Calculate discounts & sort by Rating descending
+    # Calculate discounts while preserving search relevance score order
     for i in items:
         mrp = i.get("mrp", i.get("price", 1))
         price = i.get("price", mrp)
         i["discount_pct"] = round(((mrp - price) / mrp) * 100) if mrp > price else 0
-
-    items.sort(key=lambda x: (x.get("rating", 0), x.get("discount_pct", 0)), reverse=True)
 
     # Group items sequentially by Category
     categorized: Dict[str, List[Dict[str, Any]]] = {}

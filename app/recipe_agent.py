@@ -37,6 +37,123 @@ RECIPE_DATABASE: List[Dict[str, Any]] = [
         ]
     },
     {
+        "id": "r_biryani",
+        "meal": "Lunch / Dinner",
+        "cuisine": "Hyderabadi / North Indian",
+        "recipe_name": "🍲 Hyderabadi Dum Biryani",
+        "cooking_time": "30 minutes",
+        "difficulty": "Medium",
+        "base_people": 4,
+        "base_quantities": [
+            ("Basmati Rice (Long Grain)", "500 grams"),
+            ("Paneer / Chicken / Veggies", "400 grams"),
+            ("Fresh Curd / Dahi", "200 grams"),
+            ("Fried Golden Onions (Birista)", "150 grams"),
+            ("Shahi Biryani Masala & Whole Spices", "2 tablespoons"),
+            ("Pure Cow Ghee", "4 tablespoons"),
+            ("Saffron Milk & Mint Leaves", "1/4 cup")
+        ],
+        "instructions": [
+            "Soak long grain Basmati rice for 20 mins. Parboil rice with whole spices (bay leaf, cloves, cardamom) until 70% cooked.",
+            "Marinate main ingredients with curd, ginger-garlic paste, biryani masala, and fried onions for 15 mins.",
+            "Layer marinated base and parboiled rice in a heavy pot. Drizzle pure ghee, saffron milk, and fresh mint.",
+            "Cover tightly (Dum) and cook on low flame for 12 minutes. Rest for 5 mins, fluff gently, and serve hot with Raita!"
+        ]
+    },
+    {
+        "id": "r_misal",
+        "meal": "Breakfast / Lunch",
+        "cuisine": "Maharashtrian",
+        "recipe_name": "🌶️ Puneri Spicy Misal Pav",
+        "cooking_time": "20 minutes",
+        "difficulty": "Easy",
+        "base_people": 4,
+        "base_quantities": [
+            ("Sprouted Matki (Moth Beans)", "300 grams"),
+            ("Puneri Spicy Misal Farsan Mix", "200 grams"),
+            ("Ladi Pav Buns", "8 pcs"),
+            ("Finely Chopped Red Onions & Tomatoes", "200 grams"),
+            ("Fresh Lemons & Coriander", "2 pcs"),
+            ("Kanda Lasun Masala & Oil", "3 tablespoons")
+        ],
+        "instructions": [
+            "Pressure cook sprouted matki with salt and turmeric for 2 whistles until tender.",
+            "Heat oil in a pan, sauté onions, ginger-garlic, tomatoes, and Kanda Lasun masala until oil separates (Rassa/Kut).",
+            "Add cooked matki and water to make a thin, fiery spicy gravy. Simmer for 8 minutes.",
+            "Assemble by placing matki sprout layer in a bowl, topping with spicy Farsan, raw onions, and hot spicy Rassa.",
+            "Serve hot with lemon wedges and soft Ladi Pav buns!"
+        ]
+    },
+    {
+        "id": "r_puran_poli",
+        "meal": "Festive / Dessert",
+        "cuisine": "Maharashtrian",
+        "recipe_name": "🫓 Sweet Wheat Puran Poli & Katachi Amti",
+        "cooking_time": "25 minutes",
+        "difficulty": "Medium",
+        "base_people": 4,
+        "base_quantities": [
+            ("Whole Wheat Flour (Atta)", "300 grams"),
+            ("Chana Dal (Bengal Gram)", "250 grams"),
+            ("Organic Jaggery (Gud)", "250 grams"),
+            ("Cardamom & Nutmeg Powder", "1 teaspoon"),
+            ("Pure Cow Ghee", "4 tablespoons")
+        ],
+        "instructions": [
+            "Boil Chana Dal until soft. Drain excess water (reserve stock for Katachi Amti).",
+            "Mash cooked dal with jaggery in a pan over medium heat until thick (Puran stuffing). Add cardamom powder.",
+            "Knead wheat flour into a soft pliable dough. Roll small portion, stuff with Puran ball, and seal edges.",
+            "Roll gently into thin flatbread. Roast on hot tawa with generous cow ghee until golden spots appear.",
+            "Serve hot drizzled with melted cow ghee alongside spicy Katachi Amti!"
+        ]
+    },
+    {
+        "id": "r_monsoon",
+        "meal": "Evening Snack",
+        "cuisine": "Indian Street Food",
+        "recipe_name": "🌧️ Kadak Masala Ginger Tea & Monsoon Crispy Snacks",
+        "cooking_time": "15 minutes",
+        "difficulty": "Easy",
+        "base_people": 4,
+        "base_quantities": [
+            ("Masala Ginger Tea Dust", "3 tablespoons"),
+            ("Fresh Milk & Water", "500 ml milk + 300 ml water"),
+            ("Crushed Ginger & Cardamom", "2 inches ginger"),
+            ("Sweet Corn Cobs / Pakoda Mix", "2 cobs / 250g mix"),
+            ("Butter & Chat Masala", "2 tablespoons")
+        ],
+        "instructions": [
+            "Boil water with crushed ginger, cardamom, and tea leaves for 3 minutes until rich and aromatic.",
+            "Pour fresh milk and sugar, simmer on low heat for 5 minutes until deep caramel brown.",
+            "Boil sweet corn cobs or fry pakodas until golden and crispy.",
+            "Slather warm corn with butter, chilli powder & lemon juice.",
+            "Strain hot Masala Chai into kulhad cups and enjoy with hot rainy snacks!"
+        ]
+    },
+    {
+        "id": "r_sandwich",
+        "meal": "Breakfast / Snack",
+        "cuisine": "Continental",
+        "recipe_name": "🥪 Grilled Veg Cheese & Paneer Sandwich",
+        "cooking_time": "10 minutes",
+        "difficulty": "Easy",
+        "base_people": 4,
+        "base_quantities": [
+            ("Whole Wheat Bread", "8 slices"),
+            ("Paneer Cubes / Veg Slices", "200 grams"),
+            ("Cheese Slices / Mayonnaise", "4 slices"),
+            ("Amul Butter", "2 tablespoons"),
+            ("Green Mint Chutney", "3 tablespoons")
+        ],
+        "instructions": [
+            "Spread green mint chutney and mayo evenly on bread slices.",
+            "Layer sliced cucumbers, tomatoes, spiced paneer cubes, and a cheese slice.",
+            "Butter the outer bread surfaces generously.",
+            "Grill on a sandwich toaster or hot pan until golden, crispy, and cheese is melted.",
+            "Slice diagonally and serve hot with tomato ketchup!"
+        ]
+    },
+    {
         "id": "r_dosa",
         "meal": "Breakfast / Dinner",
         "cuisine": "South Indian",
@@ -93,10 +210,9 @@ def generate_recipe(query: str, entities: Optional[Dict[str, Any]] = None) -> st
     q_lower = query.lower()
     entities = entities or {}
 
-    # Inputs: Meal, Budget, People, Cuisine
     meal = entities.get("meal_type") or ("Dinner" if "dinner" in q_lower else "Lunch" if "lunch" in q_lower else "Meal")
     cuisine = entities.get("cuisine") or ("South Indian" if "south" in q_lower or "dosa" in q_lower else "Italian" if "pasta" in q_lower or "italian" in q_lower else "North Indian")
-    
+
     people = entities.get("people") or 4
     p_match = re.search(r"(\d+)\s*(?:people|person|pax|servings)", q_lower)
     if p_match:
@@ -113,16 +229,53 @@ def generate_recipe(query: str, entities: Optional[Dict[str, Any]] = None) -> st
         except ValueError:
             pass
 
-    # Select base recipe
-    selected = RECIPE_DATABASE[0]
-    if cuisine == "South Indian" or "dosa" in q_lower:
-        selected = RECIPE_DATABASE[1]
-    elif cuisine == "Italian" or "pasta" in q_lower:
-        selected = RECIPE_DATABASE[2]
+    # Dynamic Intent Matcher
+    selected = None
+    if any(k in q_lower for k in ["biryani", "briyani", "biriyani"]):
+        selected = next((r for r in RECIPE_DATABASE if r["id"] == "r_biryani"), None)
+    elif any(k in q_lower for k in ["misal", "puneri"]):
+        selected = next((r for r in RECIPE_DATABASE if r["id"] == "r_misal"), None)
+    elif any(k in q_lower for k in ["puran", "poli", "puranpoli"]):
+        selected = next((r for r in RECIPE_DATABASE if r["id"] == "r_puran_poli"), None)
+    elif any(k in q_lower for k in ["monsoon", "rain", "tea", "chai", "pakoda"]):
+        selected = next((r for r in RECIPE_DATABASE if r["id"] == "r_monsoon"), None)
+    elif any(k in q_lower for k in ["sandwich", "toast", "bread"]):
+        selected = next((r for r in RECIPE_DATABASE if r["id"] == "r_sandwich"), None)
+    elif any(k in q_lower for k in ["dosa", "idli", "south"]):
+        selected = next((r for r in RECIPE_DATABASE if r["id"] == "r_dosa"), None)
+    elif any(k in q_lower for k in ["pasta", "italian", "penne"]):
+        selected = next((r for r in RECIPE_DATABASE if r["id"] == "r_pasta"), None)
+    elif any(k in q_lower for k in ["paneer", "shahi"]):
+        selected = next((r for r in RECIPE_DATABASE if r["id"] == "r_paneer"), None)
 
-    # Adjust quantities for people count
+    # Dynamic ingredient-based recipe generator for user custom prompts (e.g. "I have eggs & tomatoes")
+    if selected is None and ("i have" in q_lower or "ingredients" in q_lower or "recipe for" in q_lower):
+        items_found = [w.title() for w in ["egg", "eggs", "tomato", "tomatoes", "onion", "onions", "paneer", "potato", "potatoes", "bread", "cheese", "rice", "dal", "chicken", "mushroom"] if w in q_lower]
+        main_item = items_found[0] if items_found else "Custom Meal"
+        selected = {
+            "id": "r_custom",
+            "meal": meal,
+            "cuisine": cuisine,
+            "recipe_name": f"👨‍🍳 Custom {main_item} Quick Recipe Prep",
+            "cooking_time": "15 minutes",
+            "difficulty": "Easy",
+            "base_people": 4,
+            "base_quantities": [
+                (f"Fresh {item}", "As per preference") for item in items_found
+            ] + [("Pure Ghee / Cooking Oil", "2 tablespoons"), ("Spices & Salt", "To taste")],
+            "instructions": [
+                f"Clean and prep all ingredients ({', '.join(items_found) if items_found else 'available pantry staples'}).",
+                "Heat ghee or oil in a pan, sauté ginger-garlic & onions until translucent.",
+                "Add tomatoes, spices, and your main ingredients. Cook on medium flame for 8-10 minutes.",
+                "Garnish with fresh coriander leaves and serve warm!"
+            ]
+        }
+
+    if selected is None:
+        selected = RECIPE_DATABASE[0]
+
     multiplier = people / selected["base_people"]
-    
+
     ing_lines = []
     quant_lines = []
     for item, qty in selected["base_quantities"]:
@@ -134,7 +287,7 @@ def generate_recipe(query: str, entities: Optional[Dict[str, Any]] = None) -> st
     return (
         f"{selected['recipe_name']}\n\n"
         f"Meal: {meal}\n"
-        f"Cuisine: {cuisine}\n"
+        f"Cuisine: {selected.get('cuisine', cuisine)}\n"
         f"People: {people} Servings\n"
         f"Budget Target: ₹{budget}\n\n"
         f"Cooking Time: {selected['cooking_time']}\n"
